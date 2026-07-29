@@ -1,7 +1,7 @@
 <div align="center">
   <img src="docs/assets/ghostmark-icon.svg" width="112" height="112" alt="GhostMark icon">
   <h1>GhostMark</h1>
-  <p>Mark up an image before it reaches Claude Code.</p>
+  <p>Mark up an image, then send it to your AI agent in Claude Code.</p>
 </div>
 
 ## Install
@@ -14,6 +14,7 @@ Then paste an image with `Ctrl+V` or `⌘V` while Claude Code is active. GhostMa
 
 - Works across Terminal, Ghostty, iTerm2, Warp, kitty, WezTerm, and embedded IDE terminals
 - Pen, highlighter, eraser, colors, line width, undo, and redo
+- English and Traditional Chinese, selected automatically from macOS language preferences
 - Local-only image processing
 - Native SwiftUI and AppKit; no third-party runtime dependencies
 
@@ -28,7 +29,7 @@ swift test
 open GhostMark.app
 ```
 
-Development builds are ad hoc signed. Public releases are built as Universal binaries, signed with Developer ID, hardened, notarized, and stapled by `Scripts/release.sh`.
+Development builds are ad hoc signed with the separate `com.ghostmark.GhostMark.dev` bundle identifier. Public releases keep the stable `com.ghostmark.GhostMark` identity and are built as Universal binaries, signed with Developer ID, hardened, notarized, and stapled by `Scripts/release.sh`.
 
 ## Release
 

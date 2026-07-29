@@ -1,7 +1,7 @@
 import AppKit
 import Foundation
 
-struct ProcessRecord: Equatable {
+struct ProcessRecord: Equatable, Sendable {
     let pid: pid_t
     let parentPID: pid_t
     let command: String
@@ -43,22 +43,17 @@ struct ClaudeCodeSessionDetector {
         "cursor"
     ]
 
-    func isClaudeCodeFrontmost(in application: NSRunningApplication) -> Bool {
-        let processes = Self.processSnapshot()
+    func isClaudeCodeFrontmost(
+        in application: NSRunningApplication,
+        processes: [ProcessRecord]
+    ) -> Bool {
         guard !processes.isEmpty else { return false }
 
-        let descendantPIDs = Self.descendants(of: application.processIdentifier, in: processes)
-        if processes.contains(where: {
-            descendantPIDs.contains($0.pid) && Self.isClaudeCodeProcess($0)
-        }) {
-            return true
-        }
-
-        // Some terminals launch PTYs from a detached helper. In that case the
-        // ancestry link is lost, so use a deliberately broad fallback only
-        // while a terminal-like app is frontmost.
-        return isTerminalLike(application)
-            && processes.contains(where: Self.isClaudeCodeProcess)
+        return Self.containsClaudeCodeSession(
+            frontmostPID: application.processIdentifier,
+            terminalLike: isTerminalLike(application),
+            processes: processes
+        )
     }
 
     func isTerminalLike(_ application: NSRunningApplication) -> Bool {
@@ -104,7 +99,25 @@ struct ClaudeCodeSessionDetector {
                 || arguments.contains("/claude-code/cli"))
     }
 
-    private static func processSnapshot() -> [ProcessRecord] {
+    static func containsClaudeCodeSession(
+        frontmostPID: pid_t,
+        terminalLike: Bool,
+        processes: [ProcessRecord]
+    ) -> Bool {
+        let descendantPIDs = descendants(of: frontmostPID, in: processes)
+        if processes.contains(where: {
+            descendantPIDs.contains($0.pid) && isClaudeCodeProcess($0)
+        }) {
+            return true
+        }
+
+        // Some terminals launch PTYs from a detached helper. In that case the
+        // ancestry link is lost, so use a deliberately broad fallback only
+        // while a terminal-like app is frontmost.
+        return terminalLike && processes.contains(where: isClaudeCodeProcess)
+    }
+
+    static func processSnapshot() -> [ProcessRecord] {
         let process = Process()
         let outputPipe = Pipe()
 
@@ -113,8 +126,10 @@ struct ClaudeCodeSessionDetector {
         process.standardOutput = outputPipe
         process.standardError = FileHandle.nullDevice
 
+        let outputData: Data
         do {
             try process.run()
+            outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
             process.waitUntilExit()
         } catch {
             return []
@@ -122,10 +137,7 @@ struct ClaudeCodeSessionDetector {
 
         guard
             process.terminationStatus == 0,
-            let output = String(
-                data: outputPipe.fileHandleForReading.readDataToEndOfFile(),
-                encoding: .utf8
-            )
+            let output = String(data: outputData, encoding: .utf8)
         else { return [] }
 
         return output.split(separator: "\n").compactMap(parseProcessLine)

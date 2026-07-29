@@ -11,8 +11,8 @@ struct EditorView: View {
 
             MarkupCanvasView(document: document, revision: document.revision)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .accessibilityLabel("圖片標記畫布")
-                .accessibilityHint("在圖片上拖曳以使用目前選取的工具")
+                .accessibilityLabel("Image markup canvas")
+                .accessibilityHint("Drag over the image to use the selected tool")
 
             MarkupToolbar(document: document)
         }
@@ -28,14 +28,14 @@ private struct EditorHeader: View {
 
     var body: some View {
         HStack(spacing: 14) {
-            Button("取消", action: onCancel)
+            Button("Cancel", action: onCancel)
                 .keyboardShortcut(.cancelAction)
 
-            Text("標記後貼到 Claude Code")
+            Text("Mark up before sending to Claude Code")
                 .font(.headline)
                 .frame(maxWidth: .infinity, alignment: .center)
 
-            Button("完成", action: onDone)
+            Button("Done", action: onDone)
                 .keyboardShortcut(.defaultAction)
                 .buttonStyle(.borderedProminent)
         }
@@ -48,17 +48,17 @@ private struct EditorHeader: View {
 private struct MarkupToolbar: View {
     @Bindable var document: MarkupDocument
 
-    private let swatches: [Color] = [
-        .pink,
-        .red,
-        .orange,
-        .yellow,
-        .green,
-        .cyan,
-        .blue,
-        .purple,
-        .white,
-        .black
+    private let swatches: [ColorSwatch] = [
+        ColorSwatch(id: "pink", color: .pink),
+        ColorSwatch(id: "red", color: .red),
+        ColorSwatch(id: "orange", color: .orange),
+        ColorSwatch(id: "yellow", color: .yellow),
+        ColorSwatch(id: "green", color: .green),
+        ColorSwatch(id: "cyan", color: .cyan),
+        ColorSwatch(id: "blue", color: .blue),
+        ColorSwatch(id: "purple", color: .purple),
+        ColorSwatch(id: "white", color: .white),
+        ColorSwatch(id: "black", color: .black)
     ]
 
     var body: some View {
@@ -78,17 +78,17 @@ private struct MarkupToolbar: View {
 
     private var historyControls: some View {
         HStack(spacing: 6) {
-            Button("復原", systemImage: "arrow.uturn.backward", action: document.undo)
+            Button("Undo", systemImage: "arrow.uturn.backward", action: document.undo)
                 .labelStyle(.iconOnly)
                 .keyboardShortcut("z", modifiers: .command)
                 .disabled(!document.canUndo)
-                .help("復原（⌘Z）")
+                .help("Undo (⌘Z)")
 
-            Button("重做", systemImage: "arrow.uturn.forward", action: document.redo)
+            Button("Redo", systemImage: "arrow.uturn.forward", action: document.redo)
                 .labelStyle(.iconOnly)
                 .keyboardShortcut("z", modifiers: [.command, .shift])
                 .disabled(!document.canRedo)
-                .help("重做（⇧⌘Z）")
+                .help("Redo (⇧⌘Z)")
         }
         .controlSize(.large)
     }
@@ -104,9 +104,9 @@ private struct MarkupToolbar: View {
                 }
                 .buttonStyle(.bordered)
                 .tint(document.selectedTool == tool ? .accentColor : .secondary)
-                .accessibilityLabel(tool.title)
+                .accessibilityLabel(Text(tool.title))
                 .accessibilityAddTraits(document.selectedTool == tool ? .isSelected : [])
-                .help(tool.title)
+                .help(Text(tool.title))
             }
         }
         .controlSize(.large)
@@ -114,25 +114,25 @@ private struct MarkupToolbar: View {
 
     private var colorControls: some View {
         HStack(spacing: 8) {
-            ForEach(Array(swatches.enumerated()), id: \.offset) { _, color in
+            ForEach(swatches) { swatch in
                 Button {
-                    document.selectedColor = color
+                    document.selectedColor = swatch.color
                 } label: {
                     Circle()
-                        .fill(color)
+                        .fill(swatch.color)
                         .frame(width: 20, height: 20)
                         .overlay {
                             Circle()
-                                .stroke(.white.opacity(isSelected(color) ? 1 : 0), lineWidth: 2)
+                                .stroke(.white.opacity(isSelected(swatch.color) ? 1 : 0), lineWidth: 2)
                                 .padding(-3)
                         }
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel("選擇顏色")
-                .accessibilityAddTraits(isSelected(color) ? .isSelected : [])
+                .accessibilityLabel("Choose color")
+                .accessibilityAddTraits(isSelected(swatch.color) ? .isSelected : [])
             }
 
-            ColorPicker("自訂顏色", selection: $document.selectedColor, supportsOpacity: false)
+            ColorPicker("Custom color", selection: $document.selectedColor, supportsOpacity: false)
                 .labelsHidden()
                 .frame(width: 30)
         }
@@ -147,7 +147,7 @@ private struct MarkupToolbar: View {
 
             Slider(value: $document.relativeLineWidth, in: 0.002...0.03)
                 .frame(width: 130)
-                .accessibilityLabel("線條粗細")
+                .accessibilityLabel("Line width")
 
             Image(systemName: "circle.fill")
                 .font(.system(size: 17))
@@ -158,4 +158,9 @@ private struct MarkupToolbar: View {
     private func isSelected(_ color: Color) -> Bool {
         RGBAColor(color) == RGBAColor(document.selectedColor)
     }
+}
+
+private struct ColorSwatch: Identifiable {
+    let id: String
+    let color: Color
 }

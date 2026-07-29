@@ -33,6 +33,68 @@ final class ClaudeCodeSessionDetectorTests: XCTestCase {
             ProcessRecord(pid: 3, parentPID: 1, command: "node", arguments: "node server.js")
         ))
     }
+
+    func testUsesCachedProcessesForDescendantsAndDetachedTerminalSessions() {
+        let processes = [
+            ProcessRecord(pid: 100, parentPID: 1, command: "/bin/zsh", arguments: "zsh"),
+            ProcessRecord(
+                pid: 101,
+                parentPID: 100,
+                command: "/usr/local/bin/claude",
+                arguments: "claude"
+            ),
+            ProcessRecord(
+                pid: 202,
+                parentPID: 1,
+                command: "/usr/local/bin/claude",
+                arguments: "claude"
+            )
+        ]
+
+        XCTAssertTrue(
+            ClaudeCodeSessionDetector.containsClaudeCodeSession(
+                frontmostPID: 100,
+                terminalLike: false,
+                processes: processes
+            )
+        )
+        XCTAssertTrue(
+            ClaudeCodeSessionDetector.containsClaudeCodeSession(
+                frontmostPID: 999,
+                terminalLike: true,
+                processes: processes
+            )
+        )
+        XCTAssertFalse(
+            ClaudeCodeSessionDetector.containsClaudeCodeSession(
+                frontmostPID: 999,
+                terminalLike: false,
+                processes: processes
+            )
+        )
+    }
+}
+
+final class EventTapMonitorTests: XCTestCase {
+    func testRecognizesClaudeCodePasteShortcutsWithoutExtraModifiers() throws {
+        let controlPaste = try makePasteEvent(flags: .maskControl)
+        let commandPaste = try makePasteEvent(flags: .maskCommand)
+        let shiftedPaste = try makePasteEvent(flags: [.maskControl, .maskShift])
+        let plainV = try makePasteEvent(flags: [])
+
+        XCTAssertTrue(EventTapMonitor.isPasteShortcut(controlPaste))
+        XCTAssertTrue(EventTapMonitor.isPasteShortcut(commandPaste))
+        XCTAssertFalse(EventTapMonitor.isPasteShortcut(shiftedPaste))
+        XCTAssertFalse(EventTapMonitor.isPasteShortcut(plainV))
+    }
+
+    private func makePasteEvent(flags: CGEventFlags) throws -> CGEvent {
+        let event = try XCTUnwrap(
+            CGEvent(keyboardEventSource: nil, virtualKey: 9, keyDown: true)
+        )
+        event.flags = flags
+        return event
+    }
 }
 
 @MainActor
@@ -84,5 +146,52 @@ final class MarkupDocumentTests: XCTestCase {
         let outputData = try XCTUnwrap(output.dataProvider?.data) as Data
 
         XCTAssertEqual(outputData.prefix(sourceBytes.count), sourceBytes)
+    }
+}
+
+final class LocalizationTests: XCTestCase {
+    func testTraditionalChineseTranslationCoversEveryCatalogEntry() throws {
+        let catalogURL = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("Resources/Localizable.xcstrings")
+        let data = try Data(contentsOf: catalogURL)
+        let catalog = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: data) as? [String: Any]
+        )
+
+        XCTAssertEqual(catalog["sourceLanguage"] as? String, "en")
+        let strings = try XCTUnwrap(catalog["strings"] as? [String: Any])
+        let missingTranslations = strings.compactMap { key, value -> String? in
+            guard
+                let entry = value as? [String: Any],
+                let localizations = entry["localizations"] as? [String: Any],
+                localizations["zh-Hant"] != nil
+            else { return key }
+            return nil
+        }
+
+        XCTAssertFalse(strings.isEmpty)
+        XCTAssertEqual(missingTranslations, [])
+    }
+
+    func testSystemLanguageSelectionUsesTraditionalChineseAndEnglishFallback() {
+        let supported = ["en", "zh-Hant"]
+
+        XCTAssertEqual(
+            Bundle.preferredLocalizations(
+                from: supported,
+                forPreferences: ["zh-Hant-TW"]
+            ).first,
+            "zh-Hant"
+        )
+        XCTAssertEqual(
+            Bundle.preferredLocalizations(
+                from: supported,
+                forPreferences: ["fr-FR"]
+            ).first,
+            "en"
+        )
     }
 }

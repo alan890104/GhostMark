@@ -20,6 +20,11 @@ cp "$project_dir/Resources/Info.plist" "$app_dir/Contents/Info.plist"
 if [[ -f "$project_dir/Resources/AppIcon.icns" ]]; then
   cp "$project_dir/Resources/AppIcon.icns" "$app_dir/Contents/Resources/AppIcon.icns"
 fi
+if [[ -f "$project_dir/Resources/Localizable.xcstrings" ]]; then
+  xcrun xcstringstool compile \
+    "$project_dir/Resources/Localizable.xcstrings" \
+    --output-directory "$app_dir/Contents/Resources"
+fi
 
 if [[ -n "${GHOSTMARK_VERSION:-}" ]]; then
   /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $GHOSTMARK_VERSION" "$app_dir/Contents/Info.plist"
@@ -30,6 +35,10 @@ fi
 
 signing_identity="${GHOSTMARK_SIGNING_IDENTITY:--}"
 if [[ "$signing_identity" == "-" ]]; then
+  /usr/libexec/PlistBuddy \
+    -c "Set :CFBundleIdentifier com.ghostmark.GhostMark.dev" \
+    -c "Set :CFBundleName GhostMark Dev" \
+    "$app_dir/Contents/Info.plist"
   codesign --force --deep --sign - "$app_dir"
 else
   codesign \

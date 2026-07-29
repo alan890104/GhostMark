@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct OnboardingView: View {
-    @Bindable var controller: AppController
+    let controller: AppController
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var isRevealed = false
 
@@ -13,8 +13,10 @@ struct OnboardingView: View {
                 .frame(width: 154, height: 154)
                 .accessibilityHidden(true)
 
-            Text("貼圖，先畫一下。")
+            Text("Mark it. Send it to your AI agent.")
                 .font(.system(.largeTitle, design: .rounded, weight: .bold))
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 30)
                 .padding(.top, 24)
 
             OnboardingSteps()
@@ -30,7 +32,7 @@ struct OnboardingView: View {
             permissionHint
                 .frame(height: 28)
 
-            Label("圖片只留在這台 Mac", systemImage: "lock.fill")
+            Label("Your images stay on this Mac", systemImage: "lock.fill")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .padding(.bottom, 24)
@@ -52,14 +54,14 @@ struct OnboardingView: View {
         }
     }
 
-    private var primaryButtonTitle: String {
-        controller.permissionState == .granted ? "開始" : "允許並開始"
+    private var primaryButtonTitle: LocalizedStringResource {
+        controller.permissionState == .granted ? "Get started" : "Allow access"
     }
 
     @ViewBuilder
     private var permissionHint: some View {
         if controller.hasRequestedPermission, controller.permissionState != .granted {
-            Text("在系統設定打開 GhostMark")
+            Text("Turn on GhostMark in System Settings")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         } else {
@@ -69,27 +71,45 @@ struct OnboardingView: View {
 }
 
 private struct OnboardingSteps: View {
-    private let steps = [
-        ("doc.on.clipboard", "貼上"),
-        ("pencil.tip", "標記"),
-        ("paperplane.fill", "完成")
+    private let steps: [OnboardingStep] = [
+        OnboardingStep(
+            id: "paste",
+            systemImage: "doc.on.clipboard",
+            title: "Paste",
+            isEmphasized: false,
+            showsTrailingArrow: true
+        ),
+        OnboardingStep(
+            id: "mark",
+            systemImage: "pencil.tip",
+            title: "Mark",
+            isEmphasized: true,
+            showsTrailingArrow: true
+        ),
+        OnboardingStep(
+            id: "send",
+            systemImage: "paperplane.fill",
+            title: "Send",
+            isEmphasized: false,
+            showsTrailingArrow: false
+        )
     ]
 
     var body: some View {
         HStack(spacing: 13) {
-            ForEach(Array(steps.enumerated()), id: \.offset) { index, step in
+            ForEach(steps) { step in
                 VStack(spacing: 7) {
-                    Image(systemName: step.0)
+                    Image(systemName: step.systemImage)
                         .font(.system(size: 19, weight: .semibold))
-                        .foregroundStyle(index == 1 ? Color.pink : .secondary)
+                        .foregroundStyle(step.isEmphasized ? Color.pink : .secondary)
                         .frame(width: 42, height: 42)
                         .background(.white.opacity(0.06), in: .rect(cornerRadius: 12))
-                    Text(step.1)
+                    Text(step.title)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
 
-                if index < steps.count - 1 {
+                if step.showsTrailingArrow {
                     Image(systemName: "chevron.right")
                         .font(.caption2)
                         .foregroundStyle(.tertiary)
@@ -98,8 +118,16 @@ private struct OnboardingSteps: View {
             }
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("貼上、標記、完成")
+        .accessibilityLabel("Paste, mark, send")
     }
+}
+
+private struct OnboardingStep: Identifiable {
+    let id: String
+    let systemImage: String
+    let title: LocalizedStringResource
+    let isEmphasized: Bool
+    let showsTrailingArrow: Bool
 }
 
 private struct MarkGlyph: View {

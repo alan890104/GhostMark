@@ -11,11 +11,11 @@ enum MarkupTool: String, CaseIterable, Equatable, Identifiable {
 
     var id: Self { self }
 
-    var title: String {
+    var title: LocalizedStringResource {
         switch self {
-        case .pen: "畫筆"
-        case .highlighter: "螢光筆"
-        case .eraser: "橡皮擦"
+        case .pen: "Pen"
+        case .highlighter: "Highlighter"
+        case .eraser: "Eraser"
         }
     }
 

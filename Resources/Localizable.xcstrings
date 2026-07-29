@@ -1,0 +1,240 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Accessibility access is required to intercept image pastes" : {
+      "comment" : "Status message shown when the app needs Accessibility permission.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "要攔截圖片貼上，請先開啟「輔助使用」權限" } }
+      }
+    },
+    "Allow access" : {
+      "comment" : "Primary onboarding button before Accessibility permission is granted.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "開啟權限" } }
+      }
+    },
+    "Cancel" : {
+      "comment" : "Button that closes the editor without changing the clipboard.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "取消" } }
+      }
+    },
+    "Cancelled — the original clipboard is unchanged" : {
+      "comment" : "Status message shown after cancelling an edit.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "已取消，剪貼簿內容沒有變更" } }
+      }
+    },
+    "Choose color" : {
+      "comment" : "Accessibility label for a color swatch.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "選擇顏色" } }
+      }
+    },
+    "Mark it. Send it to your AI agent." : {
+      "comment" : "Onboarding headline that describes marking an image and sending it to an AI agent.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "標記圖片，再送給你的 AI Agent。" } }
+      }
+    },
+    "Couldn't export the marked-up image" : {
+      "comment" : "Status message shown when rendering the edited image fails.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "無法匯出標記後的圖片" } }
+      }
+    },
+    "Custom color" : {
+      "comment" : "Label for the system color picker.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "自訂顏色" } }
+      }
+    },
+    "Done" : {
+      "comment" : "Button that finishes editing and returns the image to Claude Code.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "完成" } }
+      }
+    },
+    "Done — pasting back into Claude Code" : {
+      "comment" : "Status message shown while returning the finished image to Claude Code.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "已完成，正在貼回 Claude Code" } }
+      }
+    },
+    "Drag over the image to use the selected tool" : {
+      "comment" : "Accessibility hint for the markup canvas.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "在圖片上拖曳，使用目前選取的工具" } }
+      }
+    },
+    "Edit image on clipboard…" : {
+      "comment" : "Menu item that opens the image currently on the clipboard.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "編輯剪貼簿裡的圖片…" } }
+      }
+    },
+    "Eraser" : {
+      "comment" : "Name of the eraser markup tool.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "橡皮擦" } }
+      }
+    },
+    "Get started" : {
+      "comment" : "Primary onboarding button after Accessibility permission is granted.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "開始使用" } }
+      }
+    },
+    "Highlighter" : {
+      "comment" : "Name of the highlighter markup tool.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "螢光筆" } }
+      }
+    },
+    "How to use GhostMark…" : {
+      "comment" : "Menu item that reopens onboarding instructions.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "GhostMark 使用方式…" } }
+      }
+    },
+    "Image markup canvas" : {
+      "comment" : "Accessibility label for the editable image area.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "圖片標記區" } }
+      }
+    },
+    "Intercept image pastes in Claude Code" : {
+      "comment" : "Menu item that enables or disables image-paste interception.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "攔截貼到 Claude Code 的圖片" } }
+      }
+    },
+    "Keyboard monitoring stopped — reopen GhostMark" : {
+      "comment" : "Status message shown when the global keyboard monitor stops unexpectedly.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "鍵盤監聽已停止，請重新開啟 GhostMark" } }
+      }
+    },
+    "Line width" : {
+      "comment" : "Accessibility label for the stroke-width slider.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "線條粗細" } }
+      }
+    },
+    "Mark" : {
+      "comment" : "Second step in the onboarding flow.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "標記" } }
+      }
+    },
+    "Mark up before sending to Claude Code" : {
+      "comment" : "Title centered above the image editor.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "先標出重點，再送進 Claude Code" } }
+      }
+    },
+    "Marked-up image copied to the clipboard" : {
+      "comment" : "Status message shown after finishing a manual clipboard edit.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "標記後的圖片已複製到剪貼簿" } }
+      }
+    },
+    "No image on the clipboard" : {
+      "comment" : "Status message shown when the clipboard editor has no image to open.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "剪貼簿裡沒有圖片" } }
+      }
+    },
+    "Open Accessibility Settings…" : {
+      "comment" : "Menu item that opens macOS Accessibility privacy settings.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "開啟「輔助使用」設定…" } }
+      }
+    },
+    "Paste" : {
+      "comment" : "First step in the onboarding flow.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "貼上" } }
+      }
+    },
+    "Paste, mark, send" : {
+      "comment" : "Accessibility summary for the three-step onboarding flow.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "貼上、標記、送出" } }
+      }
+    },
+    "Pen" : {
+      "comment" : "Name of the pen markup tool.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "畫筆" } }
+      }
+    },
+    "Quit GhostMark" : {
+      "comment" : "Menu item that quits the application.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "結束 GhostMark" } }
+      }
+    },
+    "Redo" : {
+      "comment" : "Button that reapplies the most recently undone mark.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "重做" } }
+      }
+    },
+    "Redo (⇧⌘Z)" : {
+      "comment" : "Help text for the redo button including its shortcut.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "重做（⇧⌘Z）" } }
+      }
+    },
+    "Restart keyboard monitoring" : {
+      "comment" : "Menu item that restarts the global paste-shortcut monitor.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "重新啟動鍵盤監聽" } }
+      }
+    },
+    "Send" : {
+      "comment" : "Third step in the onboarding flow.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "送出" } }
+      }
+    },
+    "Starting…" : {
+      "comment" : "Initial status message while GhostMark starts.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "正在啟動…" } }
+      }
+    },
+    "Turn on GhostMark in System Settings" : {
+      "comment" : "Onboarding hint shown after opening Accessibility settings.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "請在「系統設定」中開啟 GhostMark" } }
+      }
+    },
+    "Undo" : {
+      "comment" : "Button that removes the most recent mark.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "復原" } }
+      }
+    },
+    "Undo (⌘Z)" : {
+      "comment" : "Help text for the undo button including its shortcut.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "復原（⌘Z）" } }
+      }
+    },
+    "Watching for image pastes in Claude Code" : {
+      "comment" : "Status message shown while the paste monitor is active.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "正在監聽 Claude Code 的圖片貼上" } }
+      }
+    },
+    "Your images stay on this Mac" : {
+      "comment" : "Privacy reassurance shown at the bottom of onboarding.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "圖片只留在這台 Mac" } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

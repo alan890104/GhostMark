@@ -24,6 +24,10 @@ final class GhostMarkAppDelegate: NSObject, NSApplicationDelegate {
         self.statusItemController = statusItemController
     }
 
+    func applicationDidBecomeActive(_ notification: Notification) {
+        controller.refreshAccessibilityPermission()
+    }
+
     func applicationWillTerminate(_ notification: Notification) {
         statusItemController?.stop()
         controller.stop()

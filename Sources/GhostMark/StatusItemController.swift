@@ -38,38 +38,67 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         menu.removeAllItems()
 
         let interceptionItem = item(
-            title: "攔截 Claude Code 圖片貼上",
+            title: String(
+                localized: "Intercept image pastes in Claude Code",
+                bundle: .main,
+                comment: "Menu item that enables or disables image-paste interception."
+            ),
             action: #selector(toggleInterception)
         )
         interceptionItem.state = controller.isEnabled ? .on : .off
         menu.addItem(interceptionItem)
 
-        let status = NSMenuItem(title: controller.statusMessage, action: nil, keyEquivalent: "")
+        let status = NSMenuItem(
+            title: String(localized: controller.statusMessage),
+            action: nil,
+            keyEquivalent: ""
+        )
         status.isEnabled = false
         menu.addItem(status)
         menu.addItem(.separator())
 
         let editItem = item(
-            title: "編輯剪貼簿中的圖片…",
+            title: String(
+                localized: "Edit image on clipboard…",
+                bundle: .main,
+                comment: "Menu item that opens the image currently on the clipboard."
+            ),
             action: #selector(openClipboardEditor),
             keyEquivalent: "e"
         )
         editItem.keyEquivalentModifierMask = [.command, .shift]
         menu.addItem(editItem)
 
-        menu.addItem(item(title: "使用說明…", action: #selector(showOnboarding)))
+        menu.addItem(
+            item(
+                title: String(
+                    localized: "How to use GhostMark…",
+                    bundle: .main,
+                    comment: "Menu item that reopens onboarding instructions."
+                ),
+                action: #selector(showOnboarding)
+            )
+        )
 
         if controller.permissionState != .granted {
             menu.addItem(
                 item(
-                    title: "開啟輔助使用權限…",
+                    title: String(
+                        localized: "Open Accessibility Settings…",
+                        bundle: .main,
+                        comment: "Menu item that opens macOS Accessibility privacy settings."
+                    ),
                     action: #selector(requestAccessibilityPermission)
                 )
             )
         } else if !controller.eventTapIsActive {
             menu.addItem(
                 item(
-                    title: "重新啟動鍵盤監聽",
+                    title: String(
+                        localized: "Restart keyboard monitoring",
+                        bundle: .main,
+                        comment: "Menu item that restarts the global paste-shortcut monitor."
+                    ),
                     action: #selector(refreshAccessibilityPermission)
                 )
             )
@@ -77,7 +106,11 @@ final class StatusItemController: NSObject, NSMenuDelegate {
 
         menu.addItem(.separator())
         let quitItem = item(
-            title: "結束 GhostMark",
+            title: String(
+                localized: "Quit GhostMark",
+                bundle: .main,
+                comment: "Menu item that quits the application."
+            ),
             action: #selector(terminateApplication),
             keyEquivalent: "q"
         )

@@ -123,6 +123,12 @@ h1 {
   text-wrap: balance;
 }
 
+html[lang="zh-Hant"] h1 {
+  font-size: clamp(4.2rem, 5.6vw, 5.5rem);
+  line-height: 0.97;
+  letter-spacing: -0.065em;
+}
+
 .lede {
   max-width: 35rem;
   margin: 0;
@@ -520,6 +526,7 @@ footer a { text-decoration: underline; text-underline-offset: 3px; }
   nav { gap: 18px; }
   .hero { min-height: auto; gap: 52px; padding: 62px 0 80px; }
   h1 { font-size: clamp(3.1rem, 12.6vw, 4.1rem); }
+  html[lang="zh-Hant"] h1 { font-size: clamp(3.55rem, 16.5vw, 4.2rem); }
   .hero-actions { align-items: flex-start; flex-direction: column; gap: 18px; }
   .download { width: 100%; justify-content: space-between; }
   .product-scene { min-height: 540px; }

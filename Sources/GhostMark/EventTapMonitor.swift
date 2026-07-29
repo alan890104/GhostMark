@@ -1,5 +1,7 @@
 import AppKit
-import CoreGraphics
+// CGEvent is delivered and consumed synchronously on the main run loop. Remove
+// this compatibility import once CoreGraphics annotates CGEvent for concurrency.
+@preconcurrency import CoreGraphics
 
 @MainActor
 final class EventTapMonitor {
@@ -102,7 +104,7 @@ final class EventTapMonitor {
         }
     }
 
-    private nonisolated static func isPasteShortcut(_ event: CGEvent) -> Bool {
+    nonisolated static func isPasteShortcut(_ event: CGEvent) -> Bool {
         guard event.getIntegerValueField(.keyboardEventKeycode) == 9 else { return false }
 
         let flags = event.flags

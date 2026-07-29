@@ -1,5 +1,7 @@
 import AppKit
-import ApplicationServices
+// The Accessibility C API exposes option constants as mutable globals even
+// though GhostMark only reads them on the MainActor.
+@preconcurrency import ApplicationServices
 import Observation
 
 enum AccessibilityPermissionState: Equatable {
@@ -17,19 +19,22 @@ final class AppController {
     private(set) var isEditing = false
     private(set) var isOnboardingVisible = false
     private(set) var hasRequestedPermission = false
-    private(set) var statusMessage = "正在啟動…"
+    private(set) var statusMessage: LocalizedStringResource = "Starting…"
 
     @ObservationIgnored private let sessionDetector = ClaudeCodeSessionDetector()
     @ObservationIgnored private let editorWindowController = EditorWindowController()
     @ObservationIgnored private let onboardingWindowController = OnboardingWindowController()
     @ObservationIgnored private var eventTapMonitor: EventTapMonitor?
     @ObservationIgnored private var permissionPollTimer: Timer?
+    @ObservationIgnored private var sessionRefreshTask: Task<Void, Never>?
+    @ObservationIgnored private var sessionProcesses: [ProcessRecord] = []
     @ObservationIgnored private var activeDocument: MarkupDocument?
     @ObservationIgnored private var returnTarget: ReturnTarget?
 
     private static let onboardingCompletionKey = "GhostMark.hasCompletedOnboarding"
 
     func start() {
+        beginSessionMonitoring()
         refreshAccessibilityPermission()
         let hasCompletedOnboarding = UserDefaults.standard.bool(
             forKey: Self.onboardingCompletionKey
@@ -40,6 +45,8 @@ final class AppController {
     }
 
     func stop() {
+        sessionRefreshTask?.cancel()
+        sessionRefreshTask = nil
         permissionPollTimer?.invalidate()
         permissionPollTimer = nil
         eventTapMonitor?.stop()
@@ -92,14 +99,14 @@ final class AppController {
             }
         } else {
             eventTapMonitor?.stop()
-            statusMessage = "需要「輔助使用」權限才能攔截貼上"
+            statusMessage = "Accessibility access is required to intercept image pastes"
             beginPermissionPolling()
         }
     }
 
     func openClipboardEditor() {
         guard let image = ClipboardImage.read() else {
-            statusMessage = "剪貼簿裡沒有圖片"
+            statusMessage = "No image on the clipboard"
             return
         }
 
@@ -121,9 +128,9 @@ final class AppController {
                     guard let self else { return }
                     self.eventTapIsActive = isActive
                     if isActive {
-                        self.statusMessage = "已監聽 Claude Code 圖片貼上"
+                        self.statusMessage = "Watching for image pastes in Claude Code"
                     } else if self.permissionState == .granted {
-                        self.statusMessage = "鍵盤監聽未啟動；請重新開啟 GhostMark"
+                        self.statusMessage = "Keyboard monitoring stopped — reopen GhostMark"
                     }
                 }
             )
@@ -136,7 +143,10 @@ final class AppController {
         guard isEnabled, !isEditing else { return false }
         guard let image = ClipboardImage.read() else { return false }
         guard let frontmostApplication = NSWorkspace.shared.frontmostApplication else { return false }
-        guard sessionDetector.isClaudeCodeFrontmost(in: frontmostApplication) else { return false }
+        guard sessionDetector.isClaudeCodeFrontmost(
+            in: frontmostApplication,
+            processes: sessionProcesses
+        ) else { return false }
 
         let stableImage = frozenCopy(of: image)
         DispatchQueue.main.async { [weak self] in
@@ -170,7 +180,7 @@ final class AppController {
 
     private func cancelEditing() {
         cleanupEditor()
-        statusMessage = "已取消；原始剪貼簿未變更"
+        statusMessage = "Cancelled — the original clipboard is unchanged"
     }
 
     private func completeEditing() {
@@ -179,7 +189,7 @@ final class AppController {
             let pngData = document.renderedPNGData(),
             ClipboardImage.write(pngData: pngData)
         else {
-            statusMessage = "無法輸出標記圖片"
+            statusMessage = "Couldn't export the marked-up image"
             NSSound.beep()
             return
         }
@@ -192,11 +202,11 @@ final class AppController {
             let application = target?.application,
             !application.isTerminated
         else {
-            statusMessage = "完成圖已放入剪貼簿"
+            statusMessage = "Marked-up image copied to the clipboard"
             return
         }
 
-        statusMessage = "完成；正在貼回 Claude Code"
+        statusMessage = "Done — pasting back into Claude Code"
         application.activate(options: [])
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) { [weak self] in
             self?.eventTapMonitor?.postClaudeCodePaste()
@@ -234,6 +244,29 @@ final class AppController {
         permissionPollTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             Task { @MainActor in
                 self?.refreshAccessibilityPermission()
+            }
+        }
+    }
+
+    private func beginSessionMonitoring() {
+        guard sessionRefreshTask == nil else { return }
+
+        sessionRefreshTask = Task { [weak self] in
+            while !Task.isCancelled {
+                // Process.run() and waitUntilExit() are blocking APIs. Keep them
+                // outside the MainActor and, crucially, outside the event-tap callback.
+                let processes = await Task.detached(priority: .utility) {
+                    ClaudeCodeSessionDetector.processSnapshot()
+                }.value
+
+                guard let self else { return }
+                sessionProcesses = processes
+
+                do {
+                    try await Task.sleep(for: .milliseconds(750))
+                } catch {
+                    return
+                }
             }
         }
     }
