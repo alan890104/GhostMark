@@ -248,6 +248,30 @@ footer a:focus-visible {
 .claude-header strong { color: #d7d3cc; font-weight: 650; }
 .claude-header span { color: #77746f; }
 
+.claude-transcript {
+  display: grid;
+  gap: 11px;
+  margin-top: 46px;
+  color: #aaa6a1;
+}
+
+.conversation-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 9px;
+  background: #353535;
+  color: #efebe5;
+}
+
+.conversation-user b { color: #85817b; }
+.conversation-response,
+.conversation-thinking { display: flex; align-items: center; gap: 8px; padding-inline: 4px; }
+.conversation-response { color: #d8d4ce; }
+.conversation-response b { color: #f0ede8; font-size: .63rem; }
+.conversation-thinking { color: #7d7973; }
+.conversation-thinking b { color: #df7958; font-size: .83rem; }
+
 .claude-composer {
   position: absolute;
   right: 26px;
