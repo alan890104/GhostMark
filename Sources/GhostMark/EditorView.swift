@@ -2,14 +2,14 @@ import SwiftUI
 
 struct EditorView: View {
     @Bindable var document: MarkupDocument
-    let sendsToClaudeCode: Bool
+    let agentTarget: AgentTarget?
     let onCancel: () -> Void
     let onDone: () -> Void
 
     var body: some View {
         VStack(spacing: 0) {
             EditorHeader(
-                sendsToClaudeCode: sendsToClaudeCode,
+                agentTarget: agentTarget,
                 onCancel: onCancel,
                 onDone: onDone
             )
@@ -28,12 +28,16 @@ struct EditorView: View {
 }
 
 private struct EditorHeader: View {
-    let sendsToClaudeCode: Bool
+    let agentTarget: AgentTarget?
     let onCancel: () -> Void
     let onDone: () -> Void
 
     private var completionTitle: LocalizedStringResource {
-        sendsToClaudeCode ? "Send to Claude Code" : "Copy image"
+        agentTarget?.completionTitle ?? "Copy image"
+    }
+
+    private var editorTitle: LocalizedStringResource {
+        agentTarget == nil ? "Mark up your image" : "Mark up before sending to your AI agent"
     }
 
     var body: some View {
@@ -41,7 +45,7 @@ private struct EditorHeader: View {
             Button("Cancel", action: onCancel)
                 .keyboardShortcut(.cancelAction)
 
-            Text("Mark up before sending to Claude Code")
+            Text(editorTitle)
                 .font(.headline)
                 .frame(maxWidth: .infinity, alignment: .center)
 
@@ -49,7 +53,7 @@ private struct EditorHeader: View {
                 Label {
                     Text(completionTitle)
                 } icon: {
-                    Image(systemName: sendsToClaudeCode ? "paperplane.fill" : "doc.on.doc")
+                    Image(systemName: agentTarget == nil ? "doc.on.doc" : "paperplane.fill")
                 }
             }
                 .keyboardShortcut(.defaultAction)

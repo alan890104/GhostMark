@@ -2,7 +2,7 @@ import AppKit
 import XCTest
 @testable import GhostMark
 
-final class ClaudeCodeSessionDetectorTests: XCTestCase {
+final class AgentSessionDetectorTests: XCTestCase {
     func testFindsNestedDescendants() {
         let processes = [
             ProcessRecord(pid: 11, parentPID: 1, command: "Terminal", arguments: "Terminal"),
@@ -12,16 +12,16 @@ final class ClaudeCodeSessionDetectorTests: XCTestCase {
         ]
 
         XCTAssertEqual(
-            ClaudeCodeSessionDetector.descendants(of: 11, in: processes),
+            AgentSessionDetector.descendants(of: 11, in: processes),
             Set([12, 13, 14])
         )
     }
 
     func testRecognizesNativeAndNodeClaudeCodeProcesses() {
-        XCTAssertTrue(ClaudeCodeSessionDetector.isClaudeCodeProcess(
+        XCTAssertTrue(AgentSessionDetector.isClaudeCodeProcess(
             ProcessRecord(pid: 1, parentPID: 0, command: "/usr/local/bin/claude", arguments: "claude")
         ))
-        XCTAssertTrue(ClaudeCodeSessionDetector.isClaudeCodeProcess(
+        XCTAssertTrue(AgentSessionDetector.isClaudeCodeProcess(
             ProcessRecord(
                 pid: 2,
                 parentPID: 1,
@@ -29,7 +29,7 @@ final class ClaudeCodeSessionDetectorTests: XCTestCase {
                 arguments: "node /opt/node_modules/@anthropic-ai/claude-code/cli.js"
             )
         ))
-        XCTAssertFalse(ClaudeCodeSessionDetector.isClaudeCodeProcess(
+        XCTAssertFalse(AgentSessionDetector.isClaudeCodeProcess(
             ProcessRecord(pid: 3, parentPID: 1, command: "node", arguments: "node server.js")
         ))
     }
@@ -52,31 +52,57 @@ final class ClaudeCodeSessionDetectorTests: XCTestCase {
         ]
 
         XCTAssertTrue(
-            ClaudeCodeSessionDetector.containsClaudeCodeSession(
+            AgentSessionDetector.containsClaudeCodeSession(
                 frontmostPID: 100,
                 terminalLike: false,
                 processes: processes
             )
         )
         XCTAssertTrue(
-            ClaudeCodeSessionDetector.containsClaudeCodeSession(
+            AgentSessionDetector.containsClaudeCodeSession(
                 frontmostPID: 999,
                 terminalLike: true,
                 processes: processes
             )
         )
         XCTAssertFalse(
-            ClaudeCodeSessionDetector.containsClaudeCodeSession(
+            AgentSessionDetector.containsClaudeCodeSession(
                 frontmostPID: 999,
                 terminalLike: false,
                 processes: processes
             )
         )
     }
+
+    func testRecognizesClaudeDesktopAndCodexBundleIdentifiers() {
+        XCTAssertEqual(
+            AgentSessionDetector.nativeTarget(
+                bundleIdentifier: "com.anthropic.claudefordesktop"
+            ),
+            .claudeDesktop
+        )
+        XCTAssertEqual(
+            AgentSessionDetector.nativeTarget(bundleIdentifier: "com.openai.codex"),
+            .codex
+        )
+        XCTAssertEqual(
+            AgentSessionDetector.nativeTarget(bundleIdentifier: "com.openai.codex.beta"),
+            .codex
+        )
+        XCTAssertNil(
+            AgentSessionDetector.nativeTarget(bundleIdentifier: "com.openai.chat")
+        )
+    }
+
+    func testUsesTheCorrectPasteShortcutForEachAgent() {
+        XCTAssertEqual(AgentTarget.claudeCode.pasteShortcut, .controlV)
+        XCTAssertEqual(AgentTarget.claudeDesktop.pasteShortcut, .commandV)
+        XCTAssertEqual(AgentTarget.codex.pasteShortcut, .commandV)
+    }
 }
 
 final class EventTapMonitorTests: XCTestCase {
-    func testRecognizesClaudeCodePasteShortcutsWithoutExtraModifiers() throws {
+    func testRecognizesPasteShortcutsWithoutExtraModifiers() throws {
         let controlPaste = try makePasteEvent(flags: .maskControl)
         let commandPaste = try makePasteEvent(flags: .maskCommand)
         let shiftedPaste = try makePasteEvent(flags: [.maskControl, .maskShift])

@@ -62,15 +62,15 @@ final class EventTapMonitor {
     }
 
     @discardableResult
-    func postClaudeCodePaste() -> Bool {
+    func postPaste(using shortcut: AgentPasteShortcut) -> Bool {
         guard
             let keyDown = CGEvent(keyboardEventSource: nil, virtualKey: 9, keyDown: true),
             let keyUp = CGEvent(keyboardEventSource: nil, virtualKey: 9, keyDown: false)
         else { return false }
 
         bypassNextPaste()
-        keyDown.flags = .maskControl
-        keyUp.flags = .maskControl
+        keyDown.flags = shortcut.eventFlags
+        keyUp.flags = shortcut.eventFlags
         keyDown.post(tap: .cghidEventTap)
         keyUp.post(tap: .cghidEventTap)
         return true

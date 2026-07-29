@@ -21,7 +21,7 @@ final class AppController {
     private(set) var hasRequestedPermission = false
     private(set) var statusMessage: LocalizedStringResource = "Starting…"
 
-    @ObservationIgnored private let sessionDetector = ClaudeCodeSessionDetector()
+    @ObservationIgnored private let sessionDetector = AgentSessionDetector()
     @ObservationIgnored private let editorWindowController = EditorWindowController()
     @ObservationIgnored private let onboardingWindowController = OnboardingWindowController()
     @ObservationIgnored private var eventTapMonitor: EventTapMonitor?
@@ -117,7 +117,7 @@ final class AppController {
         beginEditing(
             image: frozenCopy(of: image),
             returnTo: sourceApplication,
-            autoPaste: false
+            agentTarget: nil
         )
     }
 
@@ -131,7 +131,7 @@ final class AppController {
                     guard let self else { return }
                     self.eventTapIsActive = isActive
                     if isActive {
-                        self.statusMessage = "Watching for image pastes in Claude Code"
+                        self.statusMessage = "Watching Claude Code, Claude, and Codex"
                     } else if self.permissionState == .granted {
                         self.statusMessage = "Keyboard monitoring stopped — reopen GhostMark"
                     }
@@ -146,8 +146,8 @@ final class AppController {
         guard isEnabled, !isEditing else { return false }
         guard let image = ClipboardImage.read() else { return false }
         guard let frontmostApplication = NSWorkspace.shared.frontmostApplication else { return false }
-        guard sessionDetector.isClaudeCodeFrontmost(
-            in: frontmostApplication,
+        guard let agentTarget = sessionDetector.target(
+            for: frontmostApplication,
             processes: sessionProcesses
         ) else { return false }
 
@@ -156,7 +156,7 @@ final class AppController {
             self?.beginEditing(
                 image: stableImage,
                 returnTo: frontmostApplication,
-                autoPaste: true
+                agentTarget: agentTarget
             )
         }
         return true
@@ -165,7 +165,7 @@ final class AppController {
     private func beginEditing(
         image: NSImage,
         returnTo application: NSRunningApplication?,
-        autoPaste: Bool
+        agentTarget: AgentTarget?
     ) {
         guard !isEditing else { return }
 
@@ -173,12 +173,12 @@ final class AppController {
         returnPasteTask = nil
         let document = MarkupDocument(sourceImage: image)
         activeDocument = document
-        returnTarget = ReturnTarget(application: application, shouldAutoPaste: autoPaste)
+        returnTarget = ReturnTarget(application: application, agentTarget: agentTarget)
         isEditing = true
 
         editorWindowController.show(
             document: document,
-            sendsToClaudeCode: autoPaste,
+            agentTarget: agentTarget,
             onCancel: { [weak self] in self?.cancelEditing() },
             onDone: { [weak self] in self?.completeEditing() }
         )
@@ -204,7 +204,7 @@ final class AppController {
         cleanupEditor()
 
         guard
-            target?.shouldAutoPaste == true,
+            let agentTarget = target?.agentTarget,
             let application = target?.application,
             !application.isTerminated
         else {
@@ -212,19 +212,23 @@ final class AppController {
             return
         }
 
-        statusMessage = "Done — pasting back into Claude Code"
+        statusMessage = agentTarget.pastingStatus
         returnPasteTask?.cancel()
         returnPasteTask = Task { [weak self] in
-            await self?.pasteBackWhenReady(to: application)
+            await self?.pasteBackWhenReady(to: application, agentTarget: agentTarget)
         }
     }
 
-    private func pasteBackWhenReady(to application: NSRunningApplication) async {
+    private func pasteBackWhenReady(
+        to application: NSRunningApplication,
+        agentTarget: AgentTarget
+    ) async {
         let currentApplication = NSRunningApplication.current
 
         // macOS 14's cooperative activation API avoids racing the full-screen
         // Space transition. Activation is only a request, so wait for AppKit to
-        // confirm the terminal really receives key events before posting Control-V.
+        // confirm the target really receives key events before posting its
+        // paste shortcut.
         NSApp.yieldActivation(to: application)
         _ = application.activate(from: currentApplication, options: [])
 
@@ -240,7 +244,7 @@ final class AppController {
                 applicationIsActive: application.isActive,
                 frontmostPID: frontmostPID
             ) {
-                // Let the terminal restore its previous first responder, then verify
+                // Let the app restore its previous first responder, then verify
                 // focus once more before posting exactly one paste event.
                 do {
                     try await Task.sleep(for: .milliseconds(60))
@@ -256,8 +260,8 @@ final class AppController {
                     frontmostPID: settledFrontmostPID
                 ) else { continue }
 
-                if eventTapMonitor?.postClaudeCodePaste() == true {
-                    statusMessage = "Marked-up image sent to Claude Code"
+                if eventTapMonitor?.postPaste(using: agentTarget.pasteShortcut) == true {
+                    statusMessage = agentTarget.sentStatus
                 } else {
                     statusMessage = "Couldn't paste automatically — image copied to the clipboard"
                 }
@@ -324,7 +328,7 @@ final class AppController {
                 // Process.run() and waitUntilExit() are blocking APIs. Keep them
                 // outside the MainActor and, crucially, outside the event-tap callback.
                 let processes = await Task.detached(priority: .utility) {
-                    ClaudeCodeSessionDetector.processSnapshot()
+                    AgentSessionDetector.processSnapshot()
                 }.value
 
                 guard let self else { return }
@@ -342,7 +346,7 @@ final class AppController {
 
 private struct ReturnTarget {
     let application: NSRunningApplication?
-    let shouldAutoPaste: Bool
+    let agentTarget: AgentTarget?
 }
 
 enum ReturnPasteReadiness {

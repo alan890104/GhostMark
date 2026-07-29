@@ -1,18 +1,19 @@
 <div align="center">
   <img src="docs/assets/ghostmark-icon.svg" width="112" height="112" alt="GhostMark icon">
   <h1>GhostMark</h1>
-  <p>Mark up an image, then send it to your AI agent in Claude Code.</p>
+  <p>Mark up an image, then send it to Claude Code, Claude Desktop, or Codex.</p>
 </div>
 
 ## Install
 
 Download the latest notarized `GhostMark.pkg` from the [download page](https://alan890104.github.io/GhostMark/) or GitHub Releases, open the installer, and grant Accessibility access once.
 
-Then paste an image with `Ctrl+V` or `⌘V` while Claude Code is active. GhostMark focuses the editor immediately; choose **Send to Claude Code** or press Return to put the marked-up image back in the prompt.
+Then paste an image while Claude Code, Claude Desktop, or Codex is active. GhostMark focuses the editor immediately; choose **Send** or press Return to put the marked-up image back in the prompt.
 
 ## Features
 
-- Works across Terminal, Ghostty, iTerm2, Warp, kitty, WezTerm, and embedded IDE terminals
+- Supports Claude Desktop and Codex with the standard `⌘V` shortcut
+- Works with Claude Code across Terminal, Ghostty, iTerm2, Warp, kitty, WezTerm, and embedded IDE terminals
 - Pen, highlighter, eraser, colors, line width, undo, and redo
 - English and Traditional Chinese, selected automatically from macOS language preferences
 - Local-only image processing

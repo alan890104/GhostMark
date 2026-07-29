@@ -8,4 +8,4 @@ GhostMark processes clipboard images entirely on your Mac.
 - No image uploads
 - No network requests from the app
 
-The Accessibility permission is used only to recognize and replay the paste shortcut while Claude Code is active. GhostMark does not record keystrokes or keep clipboard history.
+The Accessibility permission is used only to recognize and replay the paste shortcut while Claude Code, Claude Desktop, or Codex is active. GhostMark does not record keystrokes or keep clipboard history.

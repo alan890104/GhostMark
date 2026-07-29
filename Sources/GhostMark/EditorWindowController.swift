@@ -12,7 +12,7 @@ final class EditorWindowController: NSObject, NSWindowDelegate {
 
     func show(
         document: MarkupDocument,
-        sendsToClaudeCode: Bool,
+        agentTarget: AgentTarget?,
         onCancel: @escaping () -> Void,
         onDone: @escaping () -> Void
     ) {
@@ -21,7 +21,7 @@ final class EditorWindowController: NSObject, NSWindowDelegate {
 
         let content = EditorView(
             document: document,
-            sendsToClaudeCode: sendsToClaudeCode,
+            agentTarget: agentTarget,
             onCancel: onCancel,
             onDone: onDone
         )

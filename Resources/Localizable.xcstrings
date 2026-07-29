@@ -38,7 +38,7 @@
       }
     },
     "Couldn't paste automatically — image copied to the clipboard" : {
-      "comment" : "Status message shown when GhostMark could not restore terminal focus or post the image paste.",
+      "comment" : "Status message shown when GhostMark could not restore the target app's focus or post the image paste.",
       "localizations" : {
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "無法自動貼上，圖片已複製到剪貼簿" } }
       }
@@ -71,6 +71,18 @@
       "comment" : "Status message shown while returning the finished image to Claude Code.",
       "localizations" : {
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "已完成，正在貼回 Claude Code" } }
+      }
+    },
+    "Done — pasting back into Claude" : {
+      "comment" : "Status message shown while returning the finished image to Claude Desktop.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "已完成，正在貼回 Claude" } }
+      }
+    },
+    "Done — pasting back into Codex" : {
+      "comment" : "Status message shown while returning the finished image to Codex.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "已完成，正在貼回 Codex" } }
       }
     },
     "Drag over the image to use the selected tool" : {
@@ -115,10 +127,10 @@
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "圖片標記區" } }
       }
     },
-    "Intercept image pastes in Claude Code" : {
-      "comment" : "Menu item that enables or disables image-paste interception.",
+    "Intercept image pastes in AI agent apps" : {
+      "comment" : "Menu item that enables or disables image-paste interception in supported AI agent apps.",
       "localizations" : {
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "攔截貼到 Claude Code 的圖片" } }
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "攔截貼到 AI Agent 應用程式的圖片" } }
       }
     },
     "Keyboard monitoring stopped — reopen GhostMark" : {
@@ -139,10 +151,16 @@
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "標記" } }
       }
     },
-    "Mark up before sending to Claude Code" : {
-      "comment" : "Title centered above the image editor.",
+    "Mark up before sending to your AI agent" : {
+      "comment" : "Title centered above the image editor when GhostMark will return the image to an AI agent.",
       "localizations" : {
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "先標出重點，再送進 Claude Code" } }
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "標記完成後，送給你的 AI Agent" } }
+      }
+    },
+    "Mark up your image" : {
+      "comment" : "Title centered above the image editor during a manual clipboard edit.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "標記圖片" } }
       }
     },
     "Marked-up image copied to the clipboard" : {
@@ -155,6 +173,18 @@
       "comment" : "Status message shown after the finished image is pasted into Claude Code.",
       "localizations" : {
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "標記後的圖片已送進 Claude Code" } }
+      }
+    },
+    "Marked-up image sent to Claude" : {
+      "comment" : "Status message shown after the finished image is pasted into Claude Desktop.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "標記後的圖片已送進 Claude" } }
+      }
+    },
+    "Marked-up image sent to Codex" : {
+      "comment" : "Status message shown after the finished image is pasted into Codex.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "標記後的圖片已送進 Codex" } }
       }
     },
     "No image on the clipboard" : {
@@ -223,6 +253,18 @@
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "送到 Claude Code" } }
       }
     },
+    "Send to Claude" : {
+      "comment" : "Primary editor button that finishes marking and pastes the image into Claude Desktop.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "送到 Claude" } }
+      }
+    },
+    "Send to Codex" : {
+      "comment" : "Primary editor button that finishes marking and pastes the image into Codex.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "送到 Codex" } }
+      }
+    },
     "Starting…" : {
       "comment" : "Initial status message while GhostMark starts.",
       "localizations" : {
@@ -247,10 +289,10 @@
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "復原（⌘Z）" } }
       }
     },
-    "Watching for image pastes in Claude Code" : {
-      "comment" : "Status message shown while the paste monitor is active.",
+    "Watching Claude Code, Claude, and Codex" : {
+      "comment" : "Status message shown while the paste monitor is active for all supported AI agent apps.",
       "localizations" : {
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "正在監聽 Claude Code 的圖片貼上" } }
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "正在監聽 Claude Code、Claude 與 Codex" } }
       }
     },
     "Your images stay on this Mac" : {

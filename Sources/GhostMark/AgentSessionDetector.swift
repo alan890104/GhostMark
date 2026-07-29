@@ -8,7 +8,10 @@ struct ProcessRecord: Equatable, Sendable {
     let arguments: String
 }
 
-struct ClaudeCodeSessionDetector {
+struct AgentSessionDetector {
+    private static let claudeDesktopBundlePrefix = "com.anthropic.claudefordesktop"
+    private static let codexBundlePrefix = "com.openai.codex"
+
     private static let knownTerminalBundleFragments = [
         "terminal",
         "ghostty",
@@ -43,17 +46,40 @@ struct ClaudeCodeSessionDetector {
         "cursor"
     ]
 
-    func isClaudeCodeFrontmost(
-        in application: NSRunningApplication,
+    func target(
+        for application: NSRunningApplication,
         processes: [ProcessRecord]
-    ) -> Bool {
-        guard !processes.isEmpty else { return false }
+    ) -> AgentTarget? {
+        if let nativeTarget = Self.nativeTarget(
+            bundleIdentifier: application.bundleIdentifier
+        ) {
+            return nativeTarget
+        }
 
-        return Self.containsClaudeCodeSession(
+        guard !processes.isEmpty else { return nil }
+        guard Self.containsClaudeCodeSession(
             frontmostPID: application.processIdentifier,
             terminalLike: isTerminalLike(application),
             processes: processes
-        )
+        ) else { return nil }
+
+        return .claudeCode
+    }
+
+    static func nativeTarget(bundleIdentifier: String?) -> AgentTarget? {
+        let bundleID = bundleIdentifier?.lowercased() ?? ""
+
+        if bundleID == claudeDesktopBundlePrefix
+            || bundleID.hasPrefix(claudeDesktopBundlePrefix + ".") {
+            return .claudeDesktop
+        }
+
+        if bundleID == codexBundlePrefix
+            || bundleID.hasPrefix(codexBundlePrefix + ".") {
+            return .codex
+        }
+
+        return nil
     }
 
     func isTerminalLike(_ application: NSRunningApplication) -> Bool {

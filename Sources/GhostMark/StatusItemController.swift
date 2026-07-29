@@ -39,7 +39,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
 
         let interceptionItem = item(
             title: String(
-                localized: "Intercept image pastes in Claude Code",
+                localized: "Intercept image pastes in AI agent apps",
                 bundle: .main,
                 comment: "Menu item that enables or disables image-paste interception."
             ),
