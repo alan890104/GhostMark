@@ -23,7 +23,7 @@
       stepPaste: "Paste in Claude Code",
       stepFocus: "GhostMark takes focus",
       stepMark: "Mark the image",
-      stepSend: "Send it back",
+      stepSend: "Press Enter to send",
       stepAttached: "Image attached",
       setupLabel: "Setup",
       setupTitle: "Install once.<br>Keep using your terminal.",
@@ -63,7 +63,7 @@
       stepPaste: "在 Claude Code 貼上圖片",
       stepFocus: "GhostMark 取得焦點",
       stepMark: "標記圖片",
-      stepSend: "送回 Claude Code",
+      stepSend: "按 Enter 送回 Claude Code",
       stepAttached: "圖片已加入輸入框",
       setupLabel: "開始使用",
       setupTitle: "裝好之後，<br>照平常的方式貼上圖片就好。",
@@ -150,19 +150,19 @@
   const demoStep = document.querySelector("[data-demo-step]");
   const demoProgress = document.querySelector("[data-demo-progress]");
   const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const demoDuration = 4.55;
+  const demoDuration = 4.3;
   const demoPhases = [
     { at: 0, phase: "ready", step: "01", caption: "stepPaste" },
-    { at: 0.28, phase: "paste", step: "01", caption: "stepPaste" },
-    { at: 0.58, phase: "opening", step: "02", caption: "stepFocus" },
-    { at: 0.82, phase: "focused", step: "02", caption: "stepFocus" },
-    { at: 1.0, phase: "drawing", step: "03", caption: "stepMark" },
-    { at: 2.02, phase: "reviewing", step: "03", caption: "stepMark" },
-    { at: 2.2, phase: "aiming", step: "04", caption: "stepSend" },
-    { at: 2.46, phase: "pressing", step: "04", caption: "stepSend" },
-    { at: 2.64, phase: "returning", step: "04", caption: "stepSend" },
-    { at: 2.9, phase: "attached", step: "05", caption: "stepAttached" },
-    { at: 4.28, phase: "reset", step: "05", caption: "stepAttached" }
+    { at: 0.22, phase: "paste", step: "01", caption: "stepPaste" },
+    { at: 0.48, phase: "opening", step: "02", caption: "stepFocus" },
+    { at: 0.7, phase: "focused", step: "02", caption: "stepFocus" },
+    { at: 0.86, phase: "drawing", step: "03", caption: "stepMark" },
+    { at: 1.78, phase: "reviewing", step: "03", caption: "stepMark" },
+    { at: 1.9, phase: "enter-hint", step: "04", caption: "stepSend" },
+    { at: 2.3, phase: "enter-press", step: "04", caption: "stepSend" },
+    { at: 2.5, phase: "returning", step: "04", caption: "stepSend" },
+    { at: 2.72, phase: "attached", step: "05", caption: "stepAttached" },
+    { at: 4.02, phase: "reset", step: "05", caption: "stepAttached" }
   ];
   const requestedDemoPhase = params.get("demo");
 
