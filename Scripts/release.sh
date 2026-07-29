@@ -37,10 +37,18 @@ fi
 version="${version_tag#v}"
 build_number="$(date -u +%Y%m%d%H%M)"
 dist_dir="$project_dir/dist"
-dmg_path="$dist_dir/GhostMark.dmg"
-checksum_path="$dist_dir/GhostMark.dmg.sha256"
-staging_dir="$(mktemp -d)"
-trap 'rm -rf "$staging_dir"' EXIT
+zip_path="$dist_dir/GhostMark.zip"
+checksum_path="$dist_dir/GhostMark.zip.sha256"
+release_work="$(mktemp -d)"
+archive_path="$release_work/GhostMark.xcarchive"
+export_options="$release_work/ExportOptions.plist"
+notarized_dir="$release_work/notarized"
+verification_dir="$release_work/verify"
+
+cleanup() {
+  [[ -n "${release_work:-}" && -d "$release_work" ]] && rm -rf "$release_work"
+}
+trap cleanup EXIT
 
 GHOSTMARK_VERSION="$version" \
 GHOSTMARK_BUILD="$build_number" \
@@ -49,54 +57,67 @@ GHOSTMARK_UNIVERSAL=1 \
   "$project_dir/Scripts/build-app.sh" >/dev/null
 
 codesign --verify --deep --strict --verbose=2 "$project_dir/GhostMark.app"
-spctl --assess --type execute --verbose=2 "$project_dir/GhostMark.app"
-
-mkdir -p "$dist_dir"
-cp -R "$project_dir/GhostMark.app" "$staging_dir/GhostMark.app"
-ln -s /Applications "$staging_dir/Applications"
-hdiutil create \
-  -volname GhostMark \
-  -srcfolder "$staging_dir" \
-  -format UDZO \
-  -ov \
-  "$dmg_path" >/dev/null
-codesign --force --timestamp --sign "$signing_identity" "$dmg_path"
-
-notary_profile="${GHOSTMARK_NOTARY_PROFILE:-}"
-if [[ -z "$notary_profile" ]]; then
-  notary_profile="$(
-    security dump-keychain 2>/dev/null \
-      | sed -n 's/.*"svce"<blob>="com\.apple\.gke\.notary\.tool\.\([^"]*\)".*/\1/p' \
-      | sort -u \
-      | head -1
-  )"
-fi
-
-if [[ -n "$notary_profile" ]]; then
-  xcrun notarytool submit "$dmg_path" --keychain-profile "$notary_profile" --wait
-elif [[ -n "${GHOSTMARK_ASC_KEY:-}" && -n "${GHOSTMARK_ASC_KEY_ID:-}" ]]; then
-  notary_args=(--key "$GHOSTMARK_ASC_KEY" --key-id "$GHOSTMARK_ASC_KEY_ID")
-  if [[ -n "${GHOSTMARK_ASC_ISSUER:-}" ]]; then
-    notary_args+=(--issuer "$GHOSTMARK_ASC_ISSUER")
-  fi
-  xcrun notarytool submit "$dmg_path" $notary_args --wait
-else
-  echo "No notarization credential is available in Keychain." >&2
-  echo "Create one with: xcrun notarytool store-credentials GhostMark-notary" >&2
+team_id="$(codesign -dv --verbose=4 "$project_dir/GhostMark.app" 2>&1 | sed -n 's/^TeamIdentifier=//p' | head -1)"
+if [[ -z "$team_id" ]]; then
+  echo "The signed app does not include a Team ID." >&2
   exit 1
 fi
 
-xcrun stapler staple "$dmg_path"
-xcrun stapler validate "$dmg_path"
-spctl --assess --type open --context context:primary-signature --verbose=2 "$dmg_path"
+mkdir -p "$archive_path/Products/Applications" "$notarized_dir" "$verification_dir" "$dist_dir"
+ditto "$project_dir/GhostMark.app" "$archive_path/Products/Applications/GhostMark.app"
 
-(cd "$dist_dir" && shasum -a 256 GhostMark.dmg > "${checksum_path:t}")
+plutil -create xml1 "$archive_path/Info.plist"
+/usr/libexec/PlistBuddy -c "Add :ArchiveVersion integer 2" "$archive_path/Info.plist"
+plutil -insert CreationDate -date "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$archive_path/Info.plist"
+/usr/libexec/PlistBuddy -c "Add :Name string GhostMark" "$archive_path/Info.plist"
+/usr/libexec/PlistBuddy -c "Add :SchemeName string GhostMark" "$archive_path/Info.plist"
+/usr/libexec/PlistBuddy -c "Add :ApplicationProperties dict" "$archive_path/Info.plist"
+/usr/libexec/PlistBuddy -c "Add :ApplicationProperties:ApplicationPath string Applications/GhostMark.app" "$archive_path/Info.plist"
+/usr/libexec/PlistBuddy -c "Add :ApplicationProperties:Architectures array" "$archive_path/Info.plist"
+/usr/libexec/PlistBuddy -c "Add :ApplicationProperties:Architectures:0 string arm64" "$archive_path/Info.plist"
+/usr/libexec/PlistBuddy -c "Add :ApplicationProperties:Architectures:1 string x86_64" "$archive_path/Info.plist"
+/usr/libexec/PlistBuddy -c "Add :ApplicationProperties:CFBundleIdentifier string com.ghostmark.GhostMark" "$archive_path/Info.plist"
+/usr/libexec/PlistBuddy -c "Add :ApplicationProperties:CFBundleShortVersionString string $version" "$archive_path/Info.plist"
+/usr/libexec/PlistBuddy -c "Add :ApplicationProperties:CFBundleVersion string $build_number" "$archive_path/Info.plist"
+/usr/libexec/PlistBuddy -c "Add :ApplicationProperties:SigningIdentity string 'Developer ID Application'" "$archive_path/Info.plist"
+/usr/libexec/PlistBuddy -c "Add :ApplicationProperties:Team string $team_id" "$archive_path/Info.plist"
+
+plutil -create xml1 "$export_options"
+/usr/libexec/PlistBuddy -c "Add :destination string upload" "$export_options"
+/usr/libexec/PlistBuddy -c "Add :method string developer-id" "$export_options"
+/usr/libexec/PlistBuddy -c "Add :signingStyle string manual" "$export_options"
+/usr/libexec/PlistBuddy -c "Add :teamID string $team_id" "$export_options"
+
+echo "Uploading $version_tag to Apple's notary service…"
+xcodebuild \
+  -exportArchive \
+  -archivePath "$archive_path" \
+  -exportPath "$release_work/upload" \
+  -exportOptionsPlist "$export_options" \
+  -allowProvisioningUpdates
+
+xcodebuild \
+  -exportNotarizedApp \
+  -archivePath "$archive_path" \
+  -exportPath "$notarized_dir"
+
+notarized_app="$notarized_dir/GhostMark.app"
+xcrun stapler validate "$notarized_app"
+codesign --verify --deep --strict --verbose=2 "$notarized_app"
+spctl --assess --type execute --verbose=2 "$notarized_app"
+
+ditto -c -k --sequesterRsrc --keepParent "$notarized_app" "$zip_path"
+ditto -x -k "$zip_path" "$verification_dir"
+xattr -w com.apple.quarantine "0083;$(printf '%x' "$(date +%s)");GhostMark;" "$verification_dir/GhostMark.app"
+spctl --assess --type execute --verbose=2 "$verification_dir/GhostMark.app"
+
+(cd "$dist_dir" && shasum -a 256 GhostMark.zip > "${checksum_path:t}")
 
 git tag -a "$version_tag" -m "GhostMark $version"
 git push origin "$version_tag"
 gh release create \
   "$version_tag" \
-  "$dmg_path#GhostMark.dmg" \
+  "$zip_path#GhostMark.zip" \
   "$checksum_path#SHA-256" \
   --title "GhostMark $version" \
   --generate-notes \

@@ -19,7 +19,7 @@
   })
     .then((response) => response.ok ? response.json() : Promise.reject())
     .then((release) => {
-      const downloadURL = `${repositoryURL}/releases/latest/download/GhostMark.dmg`;
+      const downloadURL = `${repositoryURL}/releases/latest/download/GhostMark.zip`;
       downloadLinks.forEach((link) => {
         link.href = downloadURL;
         link.removeAttribute("aria-disabled");
