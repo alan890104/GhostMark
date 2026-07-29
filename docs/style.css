@@ -238,7 +238,7 @@ footer a:focus-visible {
 
 .claude-header {
   display: grid;
-  grid-template-columns: 70px minmax(0, 1fr);
+  grid-template-columns: 60px minmax(0, 1fr);
   align-items: flex-start;
   gap: 10px;
   color: #aaa6a1;
@@ -247,15 +247,15 @@ footer a:focus-visible {
 .claude-mark {
   margin: -2px 0 0;
   color: #df7958;
-  font: 700 .55rem/1.75 ui-monospace, "SFMono-Regular", Menlo, monospace;
-  letter-spacing: -.04em;
+  font: 700 .71rem/1.36 ui-monospace, "SFMono-Regular", Menlo, monospace;
+  letter-spacing: -.05em;
   white-space: pre;
 }
 
 .claude-brand-copy { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
 .claude-brand-copy > div { display: flex; align-items: baseline; gap: 7px; }
 .claude-brand-copy strong { color: #d7d3cc; font-weight: 650; }
-.claude-brand-copy span { overflow: hidden; color: #77746f; text-overflow: ellipsis; white-space: nowrap; }
+.claude-brand-copy span { color: #77746f; white-space: nowrap; }
 
 .claude-transcript {
   display: grid;
