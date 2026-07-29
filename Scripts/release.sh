@@ -48,16 +48,10 @@ if [[ -z "$installer_identity" ]]; then
   exit 1
 fi
 
-notary_profile="${GHOSTMARK_NOTARY_PROFILE:-}"
-if [[ -z "$notary_profile" ]]; then
-  notary_profile="$(
-    security dump-keychain 2>/dev/null \
-      | sed -n 's/.*"svce"<blob>="com\.apple\.gke\.notary\.tool\.\([^"]*\)".*/\1/p' \
-      | sort -u \
-      | head -1
-  )"
-fi
-if [[ -z "$notary_profile" ]]; then
+notary_profile="${GHOSTMARK_NOTARY_PROFILE:-GhostMark-notary}"
+if ! xcrun notarytool history \
+  --keychain-profile "$notary_profile" \
+  >/dev/null 2>&1; then
   echo "A notarytool Keychain profile is required." >&2
   echo "Create one with: xcrun notarytool store-credentials GhostMark-notary" >&2
   exit 1
