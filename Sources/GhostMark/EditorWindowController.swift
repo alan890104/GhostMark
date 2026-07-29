@@ -37,7 +37,12 @@ final class EditorWindowController: NSObject, NSWindowDelegate {
         window.isFloatingPanel = true
         window.becomesKeyOnlyIfNeeded = false
         window.level = .floating
-        window.collectionBehavior = [.fullScreenAuxiliary]
+        window.collectionBehavior = [
+            .canJoinAllSpaces,
+            .fullScreenAuxiliary,
+            .transient
+        ]
+        window.hidesOnDeactivate = false
         window.isReleasedWhenClosed = false
         window.contentViewController = hostingController
         window.delegate = self
@@ -56,6 +61,7 @@ final class EditorWindowController: NSObject, NSWindowDelegate {
 
         editorWindow = window
         NSApp.activate()
+        window.orderFrontRegardless()
         window.makeKeyAndOrderFront(nil)
     }
 

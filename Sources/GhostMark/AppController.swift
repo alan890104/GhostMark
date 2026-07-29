@@ -31,7 +31,10 @@ final class AppController {
 
     func start() {
         refreshAccessibilityPermission()
-        if !UserDefaults.standard.bool(forKey: Self.onboardingCompletionKey) {
+        let hasCompletedOnboarding = UserDefaults.standard.bool(
+            forKey: Self.onboardingCompletionKey
+        )
+        if !hasCompletedOnboarding || permissionState != .granted {
             showOnboarding()
         }
     }

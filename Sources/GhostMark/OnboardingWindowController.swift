@@ -23,6 +23,13 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
         panel.titlebarAppearsTransparent = true
         panel.isMovableByWindowBackground = true
         panel.isFloatingPanel = true
+        panel.level = .floating
+        panel.collectionBehavior = [
+            .canJoinAllSpaces,
+            .fullScreenAuxiliary,
+            .transient
+        ]
+        panel.hidesOnDeactivate = false
         panel.isReleasedWhenClosed = false
         panel.contentViewController = hostingController
         panel.delegate = self
@@ -30,6 +37,7 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
 
         window = panel
         NSApp.activate()
+        panel.orderFrontRegardless()
         panel.makeKeyAndOrderFront(nil)
     }
 

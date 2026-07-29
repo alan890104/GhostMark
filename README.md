@@ -6,7 +6,7 @@
 
 ## Install
 
-Download the latest notarized `GhostMark.zip` from the [download page](https://alan890104.github.io/GhostMark/) or GitHub Releases, move GhostMark to Applications, and grant Accessibility access once.
+Download the latest notarized `GhostMark.pkg` from the [download page](https://alan890104.github.io/GhostMark/) or GitHub Releases, open the installer, and grant Accessibility access once.
 
 Then paste an image with `Ctrl+V` or `⌘V` while Claude Code is active. GhostMark opens the editor and sends the finished image back with Claude Code's supported `Ctrl+V` shortcut.
 
@@ -36,7 +36,7 @@ Development builds are ad hoc signed. Public releases are built as Universal bin
 ./Scripts/release.sh v0.2.0
 ```
 
-The release script uses the Developer ID Application identity and Apple Account already configured in Xcode. It builds a Universal app, uploads it to Apple's notary service, exports and validates the stapled result, then pushes the version tag and release assets. The GitHub Pages download button always targets `releases/latest/download/GhostMark.zip`, so it automatically follows the newest release.
+The release script requires Developer ID Application and Developer ID Installer identities plus a `notarytool` Keychain profile. It builds a Universal app, creates a signed installer, notarizes and staples the package, validates it with Gatekeeper, then pushes the version tag and release assets. The GitHub Pages download button always targets `releases/latest/download/GhostMark.pkg`, so it automatically follows the newest release.
 
 ## Privacy
 

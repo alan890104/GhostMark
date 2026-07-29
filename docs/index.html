@@ -1,76 +1,130 @@
 <!doctype html>
-<html lang="zh-Hant">
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="貼進 Claude Code 前，先把重點圈出來。">
-    <meta name="theme-color" content="#111319">
-    <title>GhostMark — 貼圖，先畫一下</title>
+    <meta name="description" content="Draw on images before you send them to Claude Code.">
+    <meta name="theme-color" content="#f3f0e9">
+    <meta property="og:title" content="GhostMark for macOS">
+    <meta property="og:description" content="Draw on images before you send them to Claude Code.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://alan890104.github.io/GhostMark/">
+    <title>GhostMark — Image markup for Claude Code</title>
+    <link rel="canonical" href="https://alan890104.github.io/GhostMark/">
+    <link rel="alternate" hreflang="en" href="https://alan890104.github.io/GhostMark/">
+    <link rel="alternate" hreflang="zh-Hant" href="https://alan890104.github.io/GhostMark/?lang=zh-TW">
     <link rel="icon" href="assets/ghostmark-icon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="style.css">
     <script src="app.js" defer></script>
   </head>
   <body>
+    <a class="skip-link" href="#main" data-i18n="skip">Skip to content</a>
+
     <header class="site-header">
-      <a class="brand" href="./" aria-label="GhostMark 首頁">
-        <img src="assets/ghostmark-icon.svg" width="34" height="34" alt="">
+      <a class="brand" href="./" aria-label="GhostMark home">
+        <img src="assets/ghostmark-icon.svg" width="32" height="32" alt="">
         <span>GhostMark</span>
       </a>
-      <a class="github-link" data-github-link href="#">GitHub <span aria-hidden="true">↗</span></a>
+      <nav aria-label="Primary navigation" data-i18n-aria="primaryNav">
+        <a href="#setup" data-i18n="navSetup">Setup</a>
+        <a data-github-link href="#" data-i18n="navSource">Source</a>
+        <button class="language-toggle" type="button" data-language-toggle aria-label="Switch to Traditional Chinese">繁中</button>
+      </nav>
     </header>
 
-    <main>
-      <section class="hero">
+    <main id="main">
+      <section class="hero" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <div class="eyebrow"><span></span> macOS 14+</div>
-          <h1>貼圖。<br>圈出重點。<br><em>繼續寫。</em></h1>
-          <p>Claude Code 收到前，先標記。</p>
-          <a class="download" data-download-link href="#">
-            <span data-download-label>下載最新版本</span>
-            <span class="download-arrow" aria-hidden="true">↓</span>
-          </a>
-          <div class="release-meta">
-            <span data-version>最新版</span>
-            <span>Developer ID</span>
-            <span data-notary>Apple 公證</span>
+          <p class="kicker" data-i18n="kicker">A macOS utility for Claude Code</p>
+          <h1 id="hero-title" data-i18n-html="headline">Draw on it<br>before Claude<br>sees it.</h1>
+          <p class="lede" data-i18n="lede">Paste an image in your terminal. GhostMark opens a focused markup window, then sends the finished image back to Claude Code.</p>
+
+          <div class="hero-actions">
+            <a class="download" data-download-link href="#">
+              <span data-download-label data-i18n="download">Download GhostMark</span>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v10m0 0 4-4m-4 4L6 9M4 16h12"/></svg>
+            </a>
+            <a class="source-link" data-github-link href="#"><span data-i18n="viewSource">View source</span> <span aria-hidden="true">↗</span></a>
           </div>
+
+          <p class="release-meta"><span data-version>Latest release</span> · macOS 14+ · <span data-i18n="notarized">Apple notarized</span></p>
         </div>
 
-        <div class="demo" aria-label="GhostMark 操作預覽">
-          <div class="terminal-bar">
-            <div class="traffic" aria-hidden="true"><i></i><i></i><i></i></div>
-            <span>claude</span>
-            <kbd>⌃V</kbd>
-          </div>
-          <div class="canvas">
-            <div class="image-card">
-              <div class="image-title"><b>Build failed</b><span>12:42</span></div>
-              <div class="code-line wide"></div>
-              <div class="code-line mid"></div>
-              <div class="code-line short"></div>
-              <svg class="marker" viewBox="0 0 360 210" aria-hidden="true" focusable="false">
-                <path d="M28 112C36 38 118 18 218 30C317 42 346 102 311 150C270 205 110 196 49 157"/>
-              </svg>
+        <figure class="product-shot" aria-label="GhostMark image editor" data-i18n-aria="editorPreview">
+          <div class="product-scene">
+            <div class="terminal-window" aria-hidden="true">
+              <div class="mac-titlebar">
+                <span class="traffic-lights"><i></i><i></i><i></i></span>
+                <span>claude — Ghostty</span>
+              </div>
+              <div class="terminal-content">
+                <code>╭ Claude Code</code>
+                <p><span>›</span> Point out the issue in this screenshot</p>
+                <div class="paste-event"><kbd>⌃V</kbd><span>image pasted</span></div>
+              </div>
+            </div>
+
+            <div class="editor-window">
+              <div class="editor-topbar">
+                <span class="traffic-lights"><i></i><i></i><i></i></span>
+                <span>GhostMark</span>
+                <span class="topbar-hint">Image from Claude Code</span>
+              </div>
+              <div class="editor-stage">
+                <div class="sample-image">
+                  <div class="sample-heading"><strong>Build failed</strong><span>12:42</span></div>
+                  <div class="sample-rule"></div>
+                  <div class="sample-row"><span></span><b>Module not found</b></div>
+                  <div class="sample-row short"><span></span><b>src/app.ts:18</b></div>
+                  <svg class="annotation" viewBox="0 0 520 300" aria-hidden="true">
+                    <path d="M36 156C55 54 188 29 330 46c122 15 182 84 142 151-49 83-253 91-373 42-42-17-68-47-63-83Z"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="editor-toolbar" aria-hidden="true">
+                <span class="tool">↶</span>
+                <span class="tool pen">╱</span>
+                <span class="swatch selected"></span>
+                <span class="swatch graphite"></span>
+                <span class="width-control"><i></i></span>
+                <strong data-i18n="done">Done</strong>
+              </div>
             </div>
           </div>
-          <div class="toolstrip" aria-hidden="true">
-            <span>↶</span><span class="active">⌁</span><i></i><i></i><i></i><b>完成</b>
-          </div>
-        </div>
+          <figcaption><span data-i18n="paste">Paste</span><i></i><span data-i18n="mark">Mark</span><i></i><span data-i18n="send">Send</span></figcaption>
+        </figure>
       </section>
 
-      <section class="steps" aria-label="三個步驟">
-        <article><kbd>⌃V</kbd><span>貼上</span></article>
-        <div aria-hidden="true">→</div>
-        <article><span class="stroke-icon">⌁</span><span>標記</span></article>
-        <div aria-hidden="true">→</div>
-        <article><span>↵</span><span>完成</span></article>
+      <section class="setup" id="setup" aria-labelledby="setup-title">
+        <div>
+          <p class="section-label" data-i18n="setupLabel">Setup</p>
+          <h2 id="setup-title" data-i18n-html="setupTitle">Install once.<br>Keep using your terminal.</h2>
+        </div>
+        <ol>
+          <li><span>01</span><p data-i18n-html="stepOne">Open the signed <strong>.pkg</strong> installer.</p></li>
+          <li><span>02</span><p data-i18n="stepTwo">Allow Accessibility access when GhostMark asks.</p></li>
+          <li><span>03</span><p data-i18n="stepThree">Paste an image while Claude Code is active.</p></li>
+        </ol>
+      </section>
+
+      <section class="facts" aria-label="Product details" data-i18n-aria="productDetails">
+        <article>
+          <p class="section-label" data-i18n="worksLabel">Works where you work</p>
+          <h2 data-i18n="worksText">Ghostty, Terminal, iTerm2, Warp, and embedded terminals.</h2>
+        </article>
+        <article>
+          <p class="section-label" data-i18n="privacyLabel">Private by design</p>
+          <h2 data-i18n="privacyText">Your images stay on your Mac. No account, analytics, or uploads.</h2>
+        </article>
       </section>
     </main>
 
     <footer>
-      <span>100% local</span>
-      <span>不追蹤 · 不上傳</span>
+      <div>
+        <img src="assets/ghostmark-icon.svg" width="26" height="26" alt="">
+        <span>GhostMark</span>
+      </div>
+      <p><span data-i18n="openSource">Open source under the</span> <a data-repo-file="LICENSE" href="#">MIT License</a> · <a data-repo-file="PRIVACY.md" href="#" data-i18n="privacyLink">Privacy</a></p>
     </footer>
   </body>
 </html>

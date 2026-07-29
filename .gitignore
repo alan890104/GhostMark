@@ -17,5 +17,6 @@ Resources/AppIcon.iconset/
 *.pem
 *.key
 *.cer
+*.csr
 *.mobileprovision
 *.provisionprofile

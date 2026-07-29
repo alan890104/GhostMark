@@ -27,97 +27,92 @@ if git rev-parse "$version_tag" >/dev/null 2>&1; then
   exit 1
 fi
 
-identities="$(security find-identity -v -p codesigning)"
-signing_identity="$(printf '%s\n' "$identities" | sed -n 's/.*"\(Developer ID Application:[^"]*\)".*/\1/p' | head -1)"
-if [[ -z "$signing_identity" ]]; then
+identities="$(security find-identity -v)"
+application_identity="$(
+  printf '%s\n' "$identities" \
+    | sed -n 's/.*"\(Developer ID Application:[^"]*\)".*/\1/p' \
+    | head -1
+)"
+installer_identity="$(
+  printf '%s\n' "$identities" \
+    | sed -n 's/.*"\(Developer ID Installer:[^"]*\)".*/\1/p' \
+    | head -1
+)"
+
+if [[ -z "$application_identity" ]]; then
   echo "A Developer ID Application identity is required." >&2
+  exit 1
+fi
+if [[ -z "$installer_identity" ]]; then
+  echo "A Developer ID Installer identity is required." >&2
+  exit 1
+fi
+
+notary_profile="${GHOSTMARK_NOTARY_PROFILE:-}"
+if [[ -z "$notary_profile" ]]; then
+  notary_profile="$(
+    security dump-keychain 2>/dev/null \
+      | sed -n 's/.*"svce"<blob>="com\.apple\.gke\.notary\.tool\.\([^"]*\)".*/\1/p' \
+      | sort -u \
+      | head -1
+  )"
+fi
+if [[ -z "$notary_profile" ]]; then
+  echo "A notarytool Keychain profile is required." >&2
+  echo "Create one with: xcrun notarytool store-credentials GhostMark-notary" >&2
   exit 1
 fi
 
 version="${version_tag#v}"
 build_number="$(date -u +%Y%m%d%H%M)"
 dist_dir="$project_dir/dist"
-zip_path="$dist_dir/GhostMark.zip"
-checksum_path="$dist_dir/GhostMark.zip.sha256"
-release_work="$(mktemp -d)"
-archive_path="$release_work/GhostMark.xcarchive"
-export_options="$release_work/ExportOptions.plist"
-notarized_dir="$release_work/notarized"
-verification_dir="$release_work/verify"
-
-cleanup() {
-  [[ -n "${release_work:-}" && -d "$release_work" ]] && rm -rf "$release_work"
-}
-trap cleanup EXIT
+pkg_path="$dist_dir/GhostMark.pkg"
+checksum_path="$dist_dir/GhostMark.pkg.sha256"
+release_temp="$(mktemp -d "${TMPDIR%/}/GhostMark.release.XXXXXX")"
+package_root="$release_temp/root"
+trap 'rm -rf "$release_temp"' EXIT
 
 GHOSTMARK_VERSION="$version" \
 GHOSTMARK_BUILD="$build_number" \
-GHOSTMARK_SIGNING_IDENTITY="$signing_identity" \
+GHOSTMARK_SIGNING_IDENTITY="$application_identity" \
 GHOSTMARK_UNIVERSAL=1 \
   "$project_dir/Scripts/build-app.sh" >/dev/null
 
 codesign --verify --deep --strict --verbose=2 "$project_dir/GhostMark.app"
-team_id="$(codesign -dv --verbose=4 "$project_dir/GhostMark.app" 2>&1 | sed -n 's/^TeamIdentifier=//p' | head -1)"
-if [[ -z "$team_id" ]]; then
-  echo "The signed app does not include a Team ID." >&2
-  exit 1
-fi
 
-mkdir -p "$archive_path/Products/Applications" "$notarized_dir" "$verification_dir" "$dist_dir"
-ditto "$project_dir/GhostMark.app" "$archive_path/Products/Applications/GhostMark.app"
+mkdir -p "$dist_dir"
+mkdir -p "$package_root/Applications"
+COPYFILE_DISABLE=1 ditto --norsrc --noextattr \
+  "$project_dir/GhostMark.app" \
+  "$package_root/Applications/GhostMark.app"
+xattr -cr "$package_root/Applications/GhostMark.app"
+codesign --verify --deep --strict --verbose=2 \
+  "$package_root/Applications/GhostMark.app"
 
-plutil -create xml1 "$archive_path/Info.plist"
-/usr/libexec/PlistBuddy -c "Add :ArchiveVersion integer 2" "$archive_path/Info.plist"
-plutil -insert CreationDate -date "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$archive_path/Info.plist"
-/usr/libexec/PlistBuddy -c "Add :Name string GhostMark" "$archive_path/Info.plist"
-/usr/libexec/PlistBuddy -c "Add :SchemeName string GhostMark" "$archive_path/Info.plist"
-/usr/libexec/PlistBuddy -c "Add :ApplicationProperties dict" "$archive_path/Info.plist"
-/usr/libexec/PlistBuddy -c "Add :ApplicationProperties:ApplicationPath string Applications/GhostMark.app" "$archive_path/Info.plist"
-/usr/libexec/PlistBuddy -c "Add :ApplicationProperties:Architectures array" "$archive_path/Info.plist"
-/usr/libexec/PlistBuddy -c "Add :ApplicationProperties:Architectures:0 string arm64" "$archive_path/Info.plist"
-/usr/libexec/PlistBuddy -c "Add :ApplicationProperties:Architectures:1 string x86_64" "$archive_path/Info.plist"
-/usr/libexec/PlistBuddy -c "Add :ApplicationProperties:CFBundleIdentifier string com.ghostmark.GhostMark" "$archive_path/Info.plist"
-/usr/libexec/PlistBuddy -c "Add :ApplicationProperties:CFBundleShortVersionString string $version" "$archive_path/Info.plist"
-/usr/libexec/PlistBuddy -c "Add :ApplicationProperties:CFBundleVersion string $build_number" "$archive_path/Info.plist"
-/usr/libexec/PlistBuddy -c "Add :ApplicationProperties:SigningIdentity string 'Developer ID Application'" "$archive_path/Info.plist"
-/usr/libexec/PlistBuddy -c "Add :ApplicationProperties:Team string $team_id" "$archive_path/Info.plist"
+pkgbuild \
+  --root "$package_root" \
+  --component-plist "$project_dir/Resources/InstallerComponents.plist" \
+  --identifier com.ghostmark.GhostMark.pkg \
+  --version "$version" \
+  --sign "$installer_identity" \
+  "$pkg_path"
 
-plutil -create xml1 "$export_options"
-/usr/libexec/PlistBuddy -c "Add :destination string upload" "$export_options"
-/usr/libexec/PlistBuddy -c "Add :method string developer-id" "$export_options"
-/usr/libexec/PlistBuddy -c "Add :signingStyle string manual" "$export_options"
-/usr/libexec/PlistBuddy -c "Add :teamID string $team_id" "$export_options"
+pkgutil --expand "$pkg_path" "$release_temp/expanded"
+rg -q 'relocatable="false"' "$release_temp/expanded/PackageInfo"
+rg -q 'path="\./Applications/GhostMark\.app"' "$release_temp/expanded/PackageInfo"
+pkgutil --check-signature "$pkg_path"
+xcrun notarytool submit "$pkg_path" --keychain-profile "$notary_profile" --wait
+xcrun stapler staple "$pkg_path"
+xcrun stapler validate "$pkg_path"
+spctl --assess --type install --verbose=2 "$pkg_path"
 
-echo "Uploading $version_tag to Apple's notary service…"
-xcodebuild \
-  -exportArchive \
-  -archivePath "$archive_path" \
-  -exportPath "$release_work/upload" \
-  -exportOptionsPlist "$export_options" \
-  -allowProvisioningUpdates
-
-xcodebuild \
-  -exportNotarizedApp \
-  -archivePath "$archive_path" \
-  -exportPath "$notarized_dir"
-
-notarized_app="$notarized_dir/GhostMark.app"
-xcrun stapler validate "$notarized_app"
-codesign --verify --deep --strict --verbose=2 "$notarized_app"
-spctl --assess --type execute --verbose=2 "$notarized_app"
-
-ditto -c -k --sequesterRsrc --keepParent "$notarized_app" "$zip_path"
-ditto -x -k "$zip_path" "$verification_dir"
-xattr -w com.apple.quarantine "0083;$(printf '%x' "$(date +%s)");GhostMark;" "$verification_dir/GhostMark.app"
-spctl --assess --type execute --verbose=2 "$verification_dir/GhostMark.app"
-
-(cd "$dist_dir" && shasum -a 256 GhostMark.zip > "${checksum_path:t}")
+(cd "$dist_dir" && shasum -a 256 GhostMark.pkg > "${checksum_path:t}")
 
 git tag -a "$version_tag" -m "GhostMark $version"
 git push origin "$version_tag"
 gh release create \
   "$version_tag" \
-  "$zip_path#GhostMark.zip" \
+  "$pkg_path#GhostMark.pkg" \
   "$checksum_path#SHA-256" \
   --title "GhostMark $version" \
   --generate-notes \
