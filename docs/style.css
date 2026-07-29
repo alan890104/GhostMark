@@ -247,8 +247,10 @@ footer a:focus-visible {
 .claude-mark {
   margin: -2px 0 0;
   color: #df7958;
-  font: 700 .71rem/1.36 ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font: 700 .92rem/1 ui-monospace, "SFMono-Regular", Menlo, monospace;
   letter-spacing: -.05em;
+  transform: scaleX(.79);
+  transform-origin: left top;
   white-space: pre;
 }
 
