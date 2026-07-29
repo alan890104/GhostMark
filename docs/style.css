@@ -237,24 +237,25 @@ footer a:focus-visible {
 }
 
 .claude-header {
-  display: flex;
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr);
   align-items: flex-start;
-  gap: 14px;
+  gap: 10px;
   color: #aaa6a1;
 }
 
 .claude-mark {
-  margin: 1px 0 0;
+  margin: -2px 0 0;
   color: #df7958;
-  font: 700 .61rem/.77 ui-monospace, "SFMono-Regular", Menlo, monospace;
-  letter-spacing: -.09em;
+  font: 700 .55rem/1.75 ui-monospace, "SFMono-Regular", Menlo, monospace;
+  letter-spacing: -.04em;
   white-space: pre;
 }
 
-.claude-brand-copy { display: flex; flex-direction: column; gap: 1px; }
+.claude-brand-copy { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
 .claude-brand-copy > div { display: flex; align-items: baseline; gap: 7px; }
 .claude-brand-copy strong { color: #d7d3cc; font-weight: 650; }
-.claude-brand-copy span { color: #77746f; }
+.claude-brand-copy span { overflow: hidden; color: #77746f; text-overflow: ellipsis; white-space: nowrap; }
 
 .claude-transcript {
   display: grid;
