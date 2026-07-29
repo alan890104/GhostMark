@@ -125,6 +125,13 @@ h1 em {
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.38);
 }
 
+.download[aria-disabled="true"] {
+  cursor: progress;
+  opacity: 0.64;
+  box-shadow: none;
+  pointer-events: none;
+}
+
 .download:focus-visible,
 .github-link:focus-visible {
   outline: 3px solid var(--cyan);

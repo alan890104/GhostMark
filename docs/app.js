@@ -8,13 +8,10 @@
   if (!hostOwner) return;
 
   const repositoryURL = `https://github.com/${hostOwner}/${repo}`;
-  const downloadURL = `${repositoryURL}/releases/latest/download/GhostMark.dmg`;
+  const downloadLinks = document.querySelectorAll("[data-download-link]");
 
   document.querySelectorAll("[data-github-link]").forEach((link) => {
     link.href = repositoryURL;
-  });
-  document.querySelectorAll("[data-download-link]").forEach((link) => {
-    link.href = downloadURL;
   });
 
   fetch(`https://api.github.com/repos/${hostOwner}/${repo}/releases/latest`, {
@@ -22,9 +19,25 @@
   })
     .then((response) => response.ok ? response.json() : Promise.reject())
     .then((release) => {
+      const downloadURL = `${repositoryURL}/releases/latest/download/GhostMark.dmg`;
+      downloadLinks.forEach((link) => {
+        link.href = downloadURL;
+        link.removeAttribute("aria-disabled");
+      });
       document.querySelectorAll("[data-version]").forEach((label) => {
         label.textContent = release.tag_name;
       });
     })
-    .catch(() => {});
+    .catch(() => {
+      downloadLinks.forEach((link) => {
+        link.removeAttribute("href");
+        link.setAttribute("aria-disabled", "true");
+      });
+      document.querySelectorAll("[data-download-label]").forEach((label) => {
+        label.textContent = "首版公證中";
+      });
+      document.querySelectorAll("[data-notary]").forEach((label) => {
+        label.textContent = "準備中";
+      });
+    });
 })();
