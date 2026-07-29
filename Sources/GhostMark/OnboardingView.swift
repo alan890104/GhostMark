@@ -24,7 +24,9 @@ struct OnboardingView: View {
 
             Spacer(minLength: 30)
 
-            Button(primaryButtonTitle, action: controller.performOnboardingPrimaryAction)
+            Button(action: controller.performOnboardingPrimaryAction) {
+                Text(primaryButtonTitle)
+            }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
                 .frame(width: 240)
