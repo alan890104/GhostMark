@@ -238,15 +238,23 @@ footer a:focus-visible {
 
 .claude-header {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  align-items: flex-start;
+  gap: 14px;
   color: #aaa6a1;
 }
 
-.claude-mark { width: 30px; height: 27px; fill: #df7958; }
-.claude-header > div { display: flex; flex-direction: column; gap: 2px; }
-.claude-header strong { color: #d7d3cc; font-weight: 650; }
-.claude-header span { color: #77746f; }
+.claude-mark {
+  margin: 1px 0 0;
+  color: #df7958;
+  font: 700 .61rem/.77 ui-monospace, "SFMono-Regular", Menlo, monospace;
+  letter-spacing: -.09em;
+  white-space: pre;
+}
+
+.claude-brand-copy { display: flex; flex-direction: column; gap: 1px; }
+.claude-brand-copy > div { display: flex; align-items: baseline; gap: 7px; }
+.claude-brand-copy strong { color: #d7d3cc; font-weight: 650; }
+.claude-brand-copy span { color: #77746f; }
 
 .claude-transcript {
   display: grid;
