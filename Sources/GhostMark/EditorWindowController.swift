@@ -5,12 +5,14 @@ import SwiftUI
 final class EditorWindowController: NSObject, NSWindowDelegate {
     private var editorWindow: NSPanel?
     private var onWindowCancel: (() -> Void)?
+    private var focusTask: Task<Void, Never>?
     private var isControlledClose = false
 
     var isVisible: Bool { editorWindow?.isVisible == true }
 
     func show(
         document: MarkupDocument,
+        sendsToClaudeCode: Bool,
         onCancel: @escaping () -> Void,
         onDone: @escaping () -> Void
     ) {
@@ -19,6 +21,7 @@ final class EditorWindowController: NSObject, NSWindowDelegate {
 
         let content = EditorView(
             document: document,
+            sendsToClaudeCode: sendsToClaudeCode,
             onCancel: onCancel,
             onDone: onDone
         )
@@ -60,12 +63,13 @@ final class EditorWindowController: NSObject, NSWindowDelegate {
         window.setFrame(NSRect(origin: targetOrigin, size: targetSize), display: false)
 
         editorWindow = window
-        NSApp.activate()
         window.orderFrontRegardless()
-        window.makeKeyAndOrderFront(nil)
+        focusEditorWindow(window)
     }
 
     func dismiss() {
+        focusTask?.cancel()
+        focusTask = nil
         guard let editorWindow else { return }
         isControlledClose = true
         editorWindow.orderOut(nil)
@@ -81,5 +85,35 @@ final class EditorWindowController: NSObject, NSWindowDelegate {
         let cancel = onWindowCancel
         onWindowCancel = nil
         cancel?()
+    }
+
+    private func focusEditorWindow(_ window: NSPanel) {
+        focusTask?.cancel()
+        focusTask = Task { @MainActor [weak self, weak window] in
+            guard let self, let window else { return }
+
+            // A panel can stay visible over a full-screen terminal even after the
+            // terminal silently takes keyboard focus back. Keep the editor key for
+            // its entire lifetime, not just until activation succeeds once.
+            while !Task.isCancelled, self.editorWindow === window, window.isVisible {
+                guard !Task.isCancelled, self.editorWindow === window else { return }
+
+                let hasKeyboardFocus = NSApp.isActive && window.isKeyWindow
+                if !hasKeyboardFocus {
+                    NSApp.activate()
+                    window.makeKeyAndOrderFront(nil)
+                }
+
+                do {
+                    try await Task.sleep(
+                        for: hasKeyboardFocus ? .milliseconds(120) : .milliseconds(40)
+                    )
+                } catch {
+                    return
+                }
+            }
+
+            self.focusTask = nil
+        }
     }
 }

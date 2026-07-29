@@ -61,18 +61,19 @@ final class EventTapMonitor {
         bypassPasteCount += 1
     }
 
-    func postClaudeCodePaste() {
-        bypassNextPaste()
-
+    @discardableResult
+    func postClaudeCodePaste() -> Bool {
         guard
             let keyDown = CGEvent(keyboardEventSource: nil, virtualKey: 9, keyDown: true),
             let keyUp = CGEvent(keyboardEventSource: nil, virtualKey: 9, keyDown: false)
-        else { return }
+        else { return false }
 
+        bypassNextPaste()
         keyDown.flags = .maskControl
         keyUp.flags = .maskControl
         keyDown.post(tap: .cghidEventTap)
         keyUp.post(tap: .cghidEventTap)
+        return true
     }
 
     private func handle(type: CGEventType, event: CGEvent) -> Unmanaged<CGEvent>? {

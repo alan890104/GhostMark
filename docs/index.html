@@ -51,24 +51,40 @@
         </div>
 
         <figure class="product-shot" aria-label="GhostMark image editor" data-i18n-aria="editorPreview">
-          <div class="product-scene">
+          <div class="product-scene" data-demo data-phase="ready">
             <div class="terminal-window" aria-hidden="true">
               <div class="mac-titlebar">
                 <span class="traffic-lights"><i></i><i></i><i></i></span>
                 <span>claude — Ghostty</span>
               </div>
               <div class="terminal-content">
-                <code>╭ Claude Code</code>
-                <p><span>›</span> Point out the issue in this screenshot</p>
-                <div class="paste-event"><kbd>⌃V</kbd><span>image pasted</span></div>
+                <div class="claude-header">
+                  <svg class="claude-mark" viewBox="0 0 34 30" aria-hidden="true">
+                    <path d="M5 5h23v4h4v13h-5v5h-4v-5H11v5H7v-5H2V9h3V5Zm6 6v4h4v-4h-4Zm9 0v4h4v-4h-4Z"/>
+                  </svg>
+                  <div><strong>Claude Code</strong><span>Opus · ~/project</span></div>
+                </div>
+                <div class="claude-composer">
+                  <div class="prompt-line"><b>›</b><span data-i18n="demoPrompt">Explain the highlighted issue</span><i></i></div>
+                  <div class="terminal-attachment">
+                    <span class="attachment-thumb" aria-hidden="true"></span>
+                    <span>[Image #1]</span>
+                  </div>
+                  <div class="claude-rule"></div>
+                  <div class="claude-status"><span>main</span><span>Context: 0%</span><span>Thinking: xhigh</span></div>
+                </div>
+                <div class="paste-event"><kbd>⌃V</kbd><span data-i18n="pastingImage">pasting image</span></div>
               </div>
             </div>
 
             <div class="editor-window">
-              <div class="editor-topbar">
+              <div class="editor-titlebar">
                 <span class="traffic-lights"><i></i><i></i><i></i></span>
-                <span>GhostMark</span>
-                <span class="topbar-hint">Image from Claude Code</span>
+              </div>
+              <div class="editor-actionbar">
+                <span class="editor-cancel" data-i18n="cancel">Cancel</span>
+                <strong data-i18n="editorTitle">Mark up before sending to Claude Code</strong>
+                <span class="editor-send"><b aria-hidden="true">➤</b><span data-i18n="sendToClaude">Send to Claude Code</span></span>
               </div>
               <div class="editor-stage">
                 <div class="sample-image">
@@ -80,18 +96,25 @@
                     <path d="M36 156C55 54 188 29 330 46c122 15 182 84 142 151-49 83-253 91-373 42-42-17-68-47-63-83Z"/>
                   </svg>
                 </div>
+                <svg class="demo-pointer" viewBox="0 0 24 30" aria-hidden="true">
+                  <path d="M2 2l18 17-8.2.5-4.4 7.2L2 2Z"/>
+                </svg>
               </div>
               <div class="editor-toolbar" aria-hidden="true">
-                <span class="tool">↶</span>
-                <span class="tool pen">╱</span>
-                <span class="swatch selected"></span>
-                <span class="swatch graphite"></span>
-                <span class="width-control"><i></i></span>
-                <strong data-i18n="done">Done</strong>
+                <span class="tool">↶</span><span class="tool">↷</span>
+                <i class="toolbar-divider"></i>
+                <span class="tool pen">╱</span><span class="tool">▰</span><span class="tool">◇</span>
+                <i class="toolbar-divider"></i>
+                <span class="swatch selected"></span><span class="swatch red"></span><span class="swatch orange"></span><span class="swatch yellow"></span><span class="swatch green"></span><span class="swatch blue"></span>
+                <i class="toolbar-divider"></i>
+                <span class="size-dot small"></span><span class="width-control"><i></i></span><span class="size-dot large"></span>
               </div>
             </div>
           </div>
-          <figcaption><span data-i18n="paste">Paste</span><i></i><span data-i18n="mark">Mark</span><i></i><span data-i18n="send">Send</span></figcaption>
+          <figcaption class="demo-caption">
+            <span class="demo-step"><b data-demo-step>01</b><span data-demo-caption data-i18n="stepPaste">Paste in Claude Code</span></span>
+            <span class="demo-progress" aria-hidden="true"><i data-demo-progress></i></span>
+          </figcaption>
         </figure>
       </section>
 

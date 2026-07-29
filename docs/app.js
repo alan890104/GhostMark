@@ -15,10 +15,16 @@
       notarized: "Apple notarized",
       preparing: "Preparing signed installer",
       editorPreview: "Animated preview of GhostMark opening over Claude Code, marking an image, and sending it back",
-      done: "Done",
-      paste: "Paste",
-      mark: "Mark",
-      send: "Send",
+      demoPrompt: "Explain the highlighted issue",
+      pastingImage: "pasting image",
+      cancel: "Cancel",
+      editorTitle: "Mark up before sending to Claude Code",
+      sendToClaude: "Send to Claude Code",
+      stepPaste: "Paste in Claude Code",
+      stepFocus: "GhostMark takes focus",
+      stepMark: "Mark the image",
+      stepSend: "Send it back",
+      stepAttached: "Image attached",
       setupLabel: "Setup",
       setupTitle: "Install once.<br>Keep using your terminal.",
       stepOne: "Open the signed <strong>.pkg</strong> installer.",
@@ -49,10 +55,16 @@
       notarized: "通過 Apple 公證",
       preparing: "正在準備安裝檔",
       editorPreview: "在 Claude Code 貼上圖片後，GhostMark 跳出標記視窗並將完成圖片送回終端機的動畫示意",
-      done: "完成",
-      paste: "貼上",
-      mark: "標記",
-      send: "送出",
+      demoPrompt: "說明我標出的問題",
+      pastingImage: "正在貼上圖片",
+      cancel: "取消",
+      editorTitle: "先標出重點，再送進 Claude Code",
+      sendToClaude: "送到 Claude Code",
+      stepPaste: "在 Claude Code 貼上圖片",
+      stepFocus: "GhostMark 取得焦點",
+      stepMark: "標記圖片",
+      stepSend: "送回 Claude Code",
+      stepAttached: "圖片已加入輸入框",
       setupLabel: "開始使用",
       setupTitle: "裝好之後，<br>照平常的方式貼上圖片就好。",
       stepOne: "打開已簽署的 <strong>.pkg</strong> 安裝檔。",
@@ -132,6 +144,57 @@
   });
 
   applyLocale();
+
+  const demo = document.querySelector("[data-demo]");
+  const demoCaption = document.querySelector("[data-demo-caption]");
+  const demoStep = document.querySelector("[data-demo-step]");
+  const demoProgress = document.querySelector("[data-demo-progress]");
+  const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const demoDuration = 4.55;
+  const demoPhases = [
+    { at: 0, phase: "ready", step: "01", caption: "stepPaste" },
+    { at: 0.28, phase: "paste", step: "01", caption: "stepPaste" },
+    { at: 0.58, phase: "opening", step: "02", caption: "stepFocus" },
+    { at: 0.82, phase: "focused", step: "02", caption: "stepFocus" },
+    { at: 1.0, phase: "drawing", step: "03", caption: "stepMark" },
+    { at: 2.02, phase: "reviewing", step: "03", caption: "stepMark" },
+    { at: 2.2, phase: "aiming", step: "04", caption: "stepSend" },
+    { at: 2.46, phase: "pressing", step: "04", caption: "stepSend" },
+    { at: 2.64, phase: "returning", step: "04", caption: "stepSend" },
+    { at: 2.9, phase: "attached", step: "05", caption: "stepAttached" },
+    { at: 4.28, phase: "reset", step: "05", caption: "stepAttached" }
+  ];
+  const requestedDemoPhase = params.get("demo");
+
+  const renderDemoPhase = (next) => {
+    if (!demo || demo.dataset.phase === next.phase) return;
+    demo.dataset.phase = next.phase;
+    demoStep.textContent = next.step;
+    demoCaption.dataset.i18n = next.caption;
+    demoCaption.textContent = copy[locale][next.caption];
+  };
+
+  if (demo) {
+    const fixedPhase = demoPhases.find((item) => item.phase === requestedDemoPhase);
+    if (fixedPhase) {
+      renderDemoPhase(fixedPhase);
+      demoProgress.style.transform = `scaleX(${fixedPhase.at / demoDuration})`;
+    } else if (reducedMotion) {
+      renderDemoPhase({ phase: "drawing", step: "03", caption: "stepMark" });
+      demoProgress.style.transform = "scaleX(.58)";
+    } else {
+      let startedAt;
+      const tickDemo = (now) => {
+        startedAt ??= now;
+        const elapsed = ((now - startedAt) / 1000) % demoDuration;
+        const next = demoPhases.findLast((item) => elapsed >= item.at) ?? demoPhases[0];
+        renderDemoPhase(next);
+        demoProgress.style.transform = `scaleX(${elapsed / demoDuration})`;
+        requestAnimationFrame(tickDemo);
+      };
+      requestAnimationFrame(tickDemo);
+    }
+  }
 
   const downloadLinks = document.querySelectorAll("[data-download-link]");
   fetch(`https://api.github.com/repos/${hostOwner}/${repo}/releases/latest`, {

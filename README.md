@@ -8,7 +8,7 @@
 
 Download the latest notarized `GhostMark.pkg` from the [download page](https://alan890104.github.io/GhostMark/) or GitHub Releases, open the installer, and grant Accessibility access once.
 
-Then paste an image with `Ctrl+V` or `⌘V` while Claude Code is active. GhostMark opens the editor and sends the finished image back with Claude Code's supported `Ctrl+V` shortcut.
+Then paste an image with `Ctrl+V` or `⌘V` while Claude Code is active. GhostMark focuses the editor immediately; choose **Send to Claude Code** or press Return to put the marked-up image back in the prompt.
 
 ## Features
 

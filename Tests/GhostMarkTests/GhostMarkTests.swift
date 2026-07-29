@@ -97,6 +97,31 @@ final class EventTapMonitorTests: XCTestCase {
     }
 }
 
+final class ReturnPasteReadinessTests: XCTestCase {
+    func testRequiresTheTargetApplicationToBeActiveAndFrontmost() {
+        XCTAssertTrue(ReturnPasteReadiness.isReady(
+            targetPID: 42,
+            applicationIsActive: true,
+            frontmostPID: 42
+        ))
+        XCTAssertFalse(ReturnPasteReadiness.isReady(
+            targetPID: 42,
+            applicationIsActive: false,
+            frontmostPID: 42
+        ))
+        XCTAssertFalse(ReturnPasteReadiness.isReady(
+            targetPID: 42,
+            applicationIsActive: true,
+            frontmostPID: 99
+        ))
+        XCTAssertFalse(ReturnPasteReadiness.isReady(
+            targetPID: 42,
+            applicationIsActive: true,
+            frontmostPID: nil
+        ))
+    }
+}
+
 @MainActor
 final class MarkupDocumentTests: XCTestCase {
     func testPointClampingAndUndoRedo() {

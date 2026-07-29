@@ -27,6 +27,7 @@ final class AppController {
     @ObservationIgnored private var eventTapMonitor: EventTapMonitor?
     @ObservationIgnored private var permissionPollTimer: Timer?
     @ObservationIgnored private var sessionRefreshTask: Task<Void, Never>?
+    @ObservationIgnored private var returnPasteTask: Task<Void, Never>?
     @ObservationIgnored private var sessionProcesses: [ProcessRecord] = []
     @ObservationIgnored private var activeDocument: MarkupDocument?
     @ObservationIgnored private var returnTarget: ReturnTarget?
@@ -47,6 +48,8 @@ final class AppController {
     func stop() {
         sessionRefreshTask?.cancel()
         sessionRefreshTask = nil
+        returnPasteTask?.cancel()
+        returnPasteTask = nil
         permissionPollTimer?.invalidate()
         permissionPollTimer = nil
         eventTapMonitor?.stop()
@@ -166,6 +169,8 @@ final class AppController {
     ) {
         guard !isEditing else { return }
 
+        returnPasteTask?.cancel()
+        returnPasteTask = nil
         let document = MarkupDocument(sourceImage: image)
         activeDocument = document
         returnTarget = ReturnTarget(application: application, shouldAutoPaste: autoPaste)
@@ -173,6 +178,7 @@ final class AppController {
 
         editorWindowController.show(
             document: document,
+            sendsToClaudeCode: autoPaste,
             onCancel: { [weak self] in self?.cancelEditing() },
             onDone: { [weak self] in self?.completeEditing() }
         )
@@ -207,10 +213,72 @@ final class AppController {
         }
 
         statusMessage = "Done — pasting back into Claude Code"
-        application.activate(options: [])
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) { [weak self] in
-            self?.eventTapMonitor?.postClaudeCodePaste()
+        returnPasteTask?.cancel()
+        returnPasteTask = Task { [weak self] in
+            await self?.pasteBackWhenReady(to: application)
         }
+    }
+
+    private func pasteBackWhenReady(to application: NSRunningApplication) async {
+        let currentApplication = NSRunningApplication.current
+
+        // macOS 14's cooperative activation API avoids racing the full-screen
+        // Space transition. Activation is only a request, so wait for AppKit to
+        // confirm the terminal really receives key events before posting Control-V.
+        NSApp.yieldActivation(to: application)
+        _ = application.activate(from: currentApplication, options: [])
+
+        for attempt in 0..<40 {
+            guard !Task.isCancelled, !application.isTerminated else {
+                returnPasteTask = nil
+                return
+            }
+
+            let frontmostPID = NSWorkspace.shared.frontmostApplication?.processIdentifier
+            if ReturnPasteReadiness.isReady(
+                targetPID: application.processIdentifier,
+                applicationIsActive: application.isActive,
+                frontmostPID: frontmostPID
+            ) {
+                // Let the terminal restore its previous first responder, then verify
+                // focus once more before posting exactly one paste event.
+                do {
+                    try await Task.sleep(for: .milliseconds(60))
+                } catch {
+                    returnPasteTask = nil
+                    return
+                }
+
+                let settledFrontmostPID = NSWorkspace.shared.frontmostApplication?.processIdentifier
+                guard ReturnPasteReadiness.isReady(
+                    targetPID: application.processIdentifier,
+                    applicationIsActive: application.isActive,
+                    frontmostPID: settledFrontmostPID
+                ) else { continue }
+
+                if eventTapMonitor?.postClaudeCodePaste() == true {
+                    statusMessage = "Marked-up image sent to Claude Code"
+                } else {
+                    statusMessage = "Couldn't paste automatically — image copied to the clipboard"
+                }
+                returnPasteTask = nil
+                return
+            }
+
+            if attempt > 0, attempt.isMultiple(of: 8) {
+                _ = application.activate(options: [])
+            }
+
+            do {
+                try await Task.sleep(for: .milliseconds(50))
+            } catch {
+                returnPasteTask = nil
+                return
+            }
+        }
+
+        statusMessage = "Couldn't paste automatically — image copied to the clipboard"
+        returnPasteTask = nil
     }
 
     private func cleanupEditor() {
@@ -275,4 +343,14 @@ final class AppController {
 private struct ReturnTarget {
     let application: NSRunningApplication?
     let shouldAutoPaste: Bool
+}
+
+enum ReturnPasteReadiness {
+    static func isReady(
+        targetPID: pid_t,
+        applicationIsActive: Bool,
+        frontmostPID: pid_t?
+    ) -> Bool {
+        applicationIsActive && frontmostPID == targetPID
+    }
 }

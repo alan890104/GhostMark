@@ -2,12 +2,17 @@ import SwiftUI
 
 struct EditorView: View {
     @Bindable var document: MarkupDocument
+    let sendsToClaudeCode: Bool
     let onCancel: () -> Void
     let onDone: () -> Void
 
     var body: some View {
         VStack(spacing: 0) {
-            EditorHeader(onCancel: onCancel, onDone: onDone)
+            EditorHeader(
+                sendsToClaudeCode: sendsToClaudeCode,
+                onCancel: onCancel,
+                onDone: onDone
+            )
 
             MarkupCanvasView(document: document, revision: document.revision)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -23,8 +28,13 @@ struct EditorView: View {
 }
 
 private struct EditorHeader: View {
+    let sendsToClaudeCode: Bool
     let onCancel: () -> Void
     let onDone: () -> Void
+
+    private var completionTitle: LocalizedStringResource {
+        sendsToClaudeCode ? "Send to Claude Code" : "Copy image"
+    }
 
     var body: some View {
         HStack(spacing: 14) {
@@ -35,7 +45,13 @@ private struct EditorHeader: View {
                 .font(.headline)
                 .frame(maxWidth: .infinity, alignment: .center)
 
-            Button("Done", action: onDone)
+            Button(action: onDone) {
+                Label {
+                    Text(completionTitle)
+                } icon: {
+                    Image(systemName: sendsToClaudeCode ? "paperplane.fill" : "doc.on.doc")
+                }
+            }
                 .keyboardShortcut(.defaultAction)
                 .buttonStyle(.borderedProminent)
         }

@@ -31,6 +31,18 @@
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "選擇顏色" } }
       }
     },
+    "Copy image" : {
+      "comment" : "Button that finishes a manual clipboard edit and copies the image.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "複製圖片" } }
+      }
+    },
+    "Couldn't paste automatically — image copied to the clipboard" : {
+      "comment" : "Status message shown when GhostMark could not restore terminal focus or post the image paste.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "無法自動貼上，圖片已複製到剪貼簿" } }
+      }
+    },
     "Mark it. Send it to your AI agent." : {
       "comment" : "Onboarding headline that describes marking an image and sending it to an AI agent.",
       "localizations" : {
@@ -139,6 +151,12 @@
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "標記後的圖片已複製到剪貼簿" } }
       }
     },
+    "Marked-up image sent to Claude Code" : {
+      "comment" : "Status message shown after the finished image is pasted into Claude Code.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "標記後的圖片已送進 Claude Code" } }
+      }
+    },
     "No image on the clipboard" : {
       "comment" : "Status message shown when the clipboard editor has no image to open.",
       "localizations" : {
@@ -197,6 +215,12 @@
       "comment" : "Third step in the onboarding flow.",
       "localizations" : {
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "送出" } }
+      }
+    },
+    "Send to Claude Code" : {
+      "comment" : "Primary editor button that finishes marking and pastes the image into Claude Code.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "送到 Claude Code" } }
       }
     },
     "Starting…" : {
