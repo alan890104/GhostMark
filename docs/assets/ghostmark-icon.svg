@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-labelledby="title">
+  <title id="title">GhostMark app icon</title>
+  <defs>
+    <linearGradient id="surface" x1="160" y1="96" x2="864" y2="928" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1D2028"/>
+      <stop offset="1" stop-color="#0E1015"/>
+    </linearGradient>
+  </defs>
+  <rect x="72" y="72" width="880" height="880" rx="220" fill="url(#surface)"/>
+  <rect x="248" y="298" width="528" height="428" rx="104" fill="#F4F6F8"/>
+  <path d="M370 442L448 512L370 582" fill="none" stroke="#111319" stroke-width="48" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="500" y="554" width="152" height="44" rx="22" fill="#111319"/>
+  <path d="M146 560C150 302 346 184 558 210C790 238 914 396 854 612C798 812 486 860 248 754" fill="none" stroke="#FF3D73" stroke-width="58" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

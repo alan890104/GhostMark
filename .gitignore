@@ -1,0 +1,9 @@
+.DS_Store
+.build/
+.swiftpm/
+GhostMark.app/
+GhostMark-*.zip
+dist/
+Resources/AppIcon.iconset/
+*.xcarchive/
+*.dSYM/

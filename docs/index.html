@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="貼進 Claude Code 前，先把重點圈出來。">
+    <meta name="theme-color" content="#111319">
+    <title>GhostMark — 貼圖，先畫一下</title>
+    <link rel="icon" href="assets/ghostmark-icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="./" aria-label="GhostMark 首頁">
+        <img src="assets/ghostmark-icon.svg" width="34" height="34" alt="">
+        <span>GhostMark</span>
+      </a>
+      <a class="github-link" data-github-link href="#">GitHub <span aria-hidden="true">↗</span></a>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow"><span></span> macOS 14+</div>
+          <h1>貼圖。<br>圈出重點。<br><em>繼續寫。</em></h1>
+          <p>Claude Code 收到前，先標記。</p>
+          <a class="download" data-download-link href="#">
+            <span>下載最新版本</span>
+            <span class="download-arrow" aria-hidden="true">↓</span>
+          </a>
+          <div class="release-meta">
+            <span data-version>最新版</span>
+            <span>Developer ID</span>
+            <span>Apple 公證</span>
+          </div>
+        </div>
+
+        <div class="demo" aria-label="GhostMark 操作預覽">
+          <div class="terminal-bar">
+            <div class="traffic" aria-hidden="true"><i></i><i></i><i></i></div>
+            <span>claude</span>
+            <kbd>⌃V</kbd>
+          </div>
+          <div class="canvas">
+            <div class="image-card">
+              <div class="image-title"><b>Build failed</b><span>12:42</span></div>
+              <div class="code-line wide"></div>
+              <div class="code-line mid"></div>
+              <div class="code-line short"></div>
+              <svg class="marker" viewBox="0 0 360 210" aria-hidden="true" focusable="false">
+                <path d="M28 112C36 38 118 18 218 30C317 42 346 102 311 150C270 205 110 196 49 157"/>
+              </svg>
+            </div>
+          </div>
+          <div class="toolstrip" aria-hidden="true">
+            <span>↶</span><span class="active">⌁</span><i></i><i></i><i></i><b>完成</b>
+          </div>
+        </div>
+      </section>
+
+      <section class="steps" aria-label="三個步驟">
+        <article><kbd>⌃V</kbd><span>貼上</span></article>
+        <div aria-hidden="true">→</div>
+        <article><span class="stroke-icon">⌁</span><span>標記</span></article>
+        <div aria-hidden="true">→</div>
+        <article><span>↵</span><span>完成</span></article>
+      </section>
+    </main>
+
+    <footer>
+      <span>100% local</span>
+      <span>不追蹤 · 不上傳</span>
+    </footer>
+  </body>
+</html>
