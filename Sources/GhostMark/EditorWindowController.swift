@@ -28,14 +28,14 @@ final class EditorWindowController: NSObject, NSWindowDelegate {
         let hostingController = NSHostingController(rootView: content)
         let window = NSPanel(
             contentRect: .zero,
-            styleMask: [.titled, .closable, .resizable, .fullSizeContentView],
+            styleMask: [.titled, .closable, .resizable],
             backing: .buffered,
             defer: false
         )
 
         window.title = "GhostMark"
         window.titleVisibility = .hidden
-        window.titlebarAppearsTransparent = true
+        window.titlebarAppearsTransparent = false
         window.isMovableByWindowBackground = false
         window.isFloatingPanel = true
         window.becomesKeyOnlyIfNeeded = false

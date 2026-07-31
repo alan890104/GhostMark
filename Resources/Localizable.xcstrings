@@ -13,6 +13,12 @@
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "開啟權限" } }
       }
     },
+    "Arrow" : {
+      "comment" : "Name of the arrow markup tool.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "箭頭" } }
+      }
+    },
     "Cancel" : {
       "comment" : "Button that closes the editor without changing the clipboard.",
       "localizations" : {
@@ -137,6 +143,12 @@
       "comment" : "Status message shown when the global keyboard monitor stops unexpectedly.",
       "localizations" : {
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "鍵盤監聽已停止，請重新開啟 GhostMark" } }
+      }
+    },
+    "Line" : {
+      "comment" : "Name of the straight-line markup tool.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "直線" } }
       }
     },
     "Line width" : {
@@ -271,10 +283,34 @@
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "正在啟動…" } }
       }
     },
+    "Text" : {
+      "comment" : "Name of the text markup tool.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "文字" } }
+      }
+    },
+    "Text size" : {
+      "comment" : "Label for the text-size control.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "文字大小" } }
+      }
+    },
+    "Text to add" : {
+      "comment" : "Accessibility label for the inline text field on the image.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "要加入的文字" } }
+      }
+    },
     "Turn on GhostMark in System Settings" : {
       "comment" : "Onboarding hint shown after opening Accessibility settings.",
       "localizations" : {
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "請在「系統設定」中開啟 GhostMark" } }
+      }
+    },
+    "Type here" : {
+      "comment" : "Placeholder in the inline text field on the image.",
+      "localizations" : {
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "輸入文字" } }
       }
     },
     "Undo" : {

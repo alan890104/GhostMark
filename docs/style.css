@@ -656,27 +656,27 @@ footer a:focus-visible {
 
 .tool.pen { border: 1px solid rgba(255, 255, 255, 0.12); background: #2a292c; color: #0a84ff; }
 .toolbar-divider { width: 1px; height: 27px; margin-inline: 4px; background: rgba(255, 255, 255, 0.12); }
-.swatch { width: 15px; height: 15px; border-radius: 50%; background: var(--accent); }
-.swatch.selected { outline: 2px solid white; outline-offset: 2px; margin-left: 3px; }
-.swatch.red { background: #ff453a; }
-.swatch.orange { background: #ff9f0a; }
-.swatch.yellow { background: #ffd60a; }
-.swatch.green { background: #30d158; }
-.swatch.blue { background: #0a84ff; }
 
-.size-dot { display: block; border-radius: 50%; background: #d5d2cd; }
-.size-dot.small { width: 5px; height: 5px; }
-.size-dot.large { width: 13px; height: 13px; }
-
-.width-control {
-  width: 62px;
-  height: 6px;
-  margin-inline: 5px;
-  border-radius: 5px;
-  background: #403e41;
+.style-tool {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 7px;
+  background: #2a292c;
 }
 
-.width-control i { display: block; width: 31px; height: 6px; border-radius: inherit; background: #aaa6a1; }
+.style-tool .swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  outline: 1.5px solid white;
+  outline-offset: 2px;
+}
+
+.style-tool.size { color: #d5d2cd; font-size: 1.1rem; font-weight: 700; }
 
 .product-shot figcaption {
   display: flex;
@@ -800,14 +800,10 @@ footer a { text-decoration: underline; text-underline-offset: 3px; }
   .editor-stage { min-height: 300px; }
   .sample-row b, .editor-actionbar strong { display: none; }
   .editor-actionbar { grid-template-columns: 1fr 1fr; }
-  .editor-toolbar { gap: 9px; }
-  .editor-toolbar .swatch.orange,
-  .editor-toolbar .swatch.yellow,
-  .editor-toolbar .swatch.green,
-  .editor-toolbar .size-dot,
-  .editor-toolbar .width-control,
-  .editor-toolbar .toolbar-divider:last-of-type { display: none; }
-  .width-control { width: 42px; }
+  .editor-toolbar { gap: 4px; padding-inline: 8px; }
+  .editor-toolbar .tool,
+  .editor-toolbar .style-tool { width: 26px; height: 26px; }
+  .editor-toolbar .toolbar-divider { margin-inline: 2px; }
   .demo-step { min-width: 0; }
   .demo-progress { width: 64px; }
   .setup { padding: 82px 0 92px; }

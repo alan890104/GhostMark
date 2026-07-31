@@ -14,7 +14,7 @@ Then paste an image while Claude Code, Claude Desktop, or Codex is active. Ghost
 
 - Supports Claude Desktop and Codex with the standard `⌘V` shortcut
 - Works with Claude Code across Terminal, Ghostty, iTerm2, Warp, kitty, WezTerm, and embedded IDE terminals
-- Pen, highlighter, eraser, colors, line width, undo, and redo
+- Pen, highlighter, straight lines, arrows, text, eraser, colors, sizing, undo, and redo
 - English and Traditional Chinese, selected automatically from macOS language preferences
 - Local-only image processing
 - Native SwiftUI and AppKit; no third-party runtime dependencies
