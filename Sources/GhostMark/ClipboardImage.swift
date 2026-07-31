@@ -1,8 +1,17 @@
 import AppKit
 
 enum ClipboardImage {
-    static func read() -> NSImage? {
-        let pasteboard = NSPasteboard.general
+    private static let fileReferenceTypes: Set<NSPasteboard.PasteboardType> = [
+        .fileURL,
+        NSPasteboard.PasteboardType("NSFilenamesPboardType"),
+        NSPasteboard.PasteboardType("com.apple.pasteboard.promised-file-url")
+    ]
+
+    static func read(from pasteboard: NSPasteboard = .general) -> NSImage? {
+        // Finder includes image previews alongside file URLs. A file copy must
+        // retain its native paste behavior (path or attachment), so file
+        // references always take precedence over image representations.
+        guard !containsFileReference(in: pasteboard) else { return nil }
 
         if let image = NSImage(pasteboard: pasteboard), image.isValid {
             return image
@@ -16,22 +25,19 @@ enum ClipboardImage {
             return image
         }
 
-        let urlClasses: [AnyClass] = [NSURL.self]
-        let options: [NSPasteboard.ReadingOptionKey: Any] = [
-            .urlReadingFileURLsOnly: true,
-            .urlReadingContentsConformToTypes: NSImage.imageTypes
-        ]
-        if
-            let url = pasteboard.readObjects(
-                forClasses: urlClasses,
-                options: options
-            )?.first as? URL,
-            let image = NSImage(contentsOf: url)
-        {
-            return image
+        return nil
+    }
+
+    private static func containsFileReference(in pasteboard: NSPasteboard) -> Bool {
+        let types = Set(pasteboard.types ?? [])
+        if !types.isDisjoint(with: fileReferenceTypes) {
+            return true
         }
 
-        return nil
+        return pasteboard.canReadObject(
+            forClasses: [NSURL.self],
+            options: [.urlReadingFileURLsOnly: true]
+        )
     }
 
     static func write(pngData: Data) -> Bool {
