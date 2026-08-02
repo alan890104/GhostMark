@@ -20,28 +20,15 @@ struct ClipboardImageTests {
     }
 
     @MainActor
-    @Test("Finder markers keep file copies native even when a preview is present")
-    func finderFileWithPreviewIsNotReadAsClipboardImage() throws {
+    @Test("A file URL wins over image preview data")
+    func fileWithPreviewIsNotReadAsClipboardImage() throws {
         let pasteboard = makePasteboard()
         let item = NSPasteboardItem()
-        item.setString("finder-item", forType: NSPasteboard.PasteboardType("com.apple.finder.node"))
         item.setString("file:///Users/example/Desktop/reference.png", forType: .fileURL)
         item.setData(try pngData(), forType: .png)
         #expect(pasteboard.writeObjects([item]))
 
         #expect(ClipboardImage.read(from: pasteboard) == nil)
-    }
-
-    @MainActor
-    @Test("Copy Image data wins over an accompanying temporary file URL")
-    func bitmapWithTemporaryFileURLIsReadAsClipboardImage() throws {
-        let pasteboard = makePasteboard()
-        let item = NSPasteboardItem()
-        item.setString("file:///private/tmp/telegram-image.png", forType: .fileURL)
-        item.setData(try pngData(), forType: .png)
-        #expect(pasteboard.writeObjects([item]))
-
-        #expect(ClipboardImage.read(from: pasteboard)?.isValid == true)
     }
 
     @MainActor

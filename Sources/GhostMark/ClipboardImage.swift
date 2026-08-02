@@ -10,17 +10,13 @@ enum ClipboardImage {
         NSPasteboard.PasteboardType("NeXT TIFF v4.0 pasteboard type")
     ])
 
-    private static let explicitFileCopyTypes: Set<NSPasteboard.PasteboardType> = [
-        NSPasteboard.PasteboardType("com.apple.finder.node")
-    ]
-
     static func read(from pasteboard: NSPasteboard = .general) -> NSImage? {
         let types = Set(pasteboard.types ?? [])
 
-        // "Copy Image" sources can include a temporary file URL alongside the
-        // bitmap. Prefer explicit image data unless the pasteboard identifies
-        // itself as a real file copy (for example, Finder).
-        guard !isFileCopy(pasteboard, types: types) else { return nil }
+        // A readable local file URL represents a file paste. Finder may also
+        // advertise image preview data, but the file semantics must win so the
+        // destination can receive its native path or attachment behavior.
+        guard !containsFileReference(pasteboard, types: types) else { return nil }
 
         for type in pasteboard.types ?? [] where explicitImageTypes.contains(type) {
             if
@@ -47,18 +43,10 @@ enum ClipboardImage {
         return nil
     }
 
-    private static func isFileCopy(
+    private static func containsFileReference(
         _ pasteboard: NSPasteboard,
         types: Set<NSPasteboard.PasteboardType>
     ) -> Bool {
-        if !types.isDisjoint(with: explicitFileCopyTypes) {
-            return true
-        }
-
-        if !types.isDisjoint(with: explicitImageTypes) {
-            return false
-        }
-
         if types.contains(.fileURL) {
             return true
         }
