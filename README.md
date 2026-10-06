@@ -4,6 +4,15 @@
   <p>Mark up an image, then send it to Claude Code, Claude Desktop, or Codex.</p>
 </div>
 
+> [!WARNING]
+> **GhostMark is no longer maintained and this repository is archived.** For Claude Code, use **[paste-preview](https://github.com/alan890104/claude-code-paste-preview)** instead: a Claude Code plugin that shows a thumbnail of every pasted image and opens an editor the moment you paste. Install it from a Claude Code prompt:
+>
+> ```
+> /plugin install paste-preview --marketplace alan890104/claude-code-paste-preview
+> ```
+>
+> GhostMark 已停止維護，這個 repo 已封存。Claude Code 請改用 **[paste-preview](https://github.com/alan890104/claude-code-paste-preview)**。
+
 ## Install
 
 Download the latest notarized `GhostMark.pkg` from the [download page](https://alan890104.github.io/GhostMark/) or GitHub Releases, open the installer, and grant Accessibility access once.
